@@ -1,0 +1,515 @@
+nav {
+    position: sticky;
+    top: 0;
+    /* Sticks to the top of the viewport */
+    z-index: 1000;
+    /* Ensures it stays above other content */
+    background-color: rgb(237, 242, 237);
+    /* Optional: adds background */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    /* Optional: adds subtle shadow */
+    padding: 0.7rem;
+    text-align: center;
+}
+
+nav a {
+    text-decoration: none;
+}
+
+.navbar-custom a {
+    color: rgb(40, 28, 28);
+    text-decoration: none;
+    margin: 0 0.2rem;
+}
+
+.navbar-custom a:hover {
+    text-decoration: underline;
+}
+
+.navbar-custom a.active {
+    color: #3273dc;
+    font-weight: bold;
+}
+
+.section {
+    display: none;
+    margin: 3rem;
+}
+
+.section.active {
+    display: block;
+}
+
+.container2 {
+    margin-top: 20px;
+
+}
+
+/* Custom styles for compact design with background */
+.card-details {
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 0px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: #363636;
+    text-align: center;
+}
+
+.titleHead {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.data-item {
+    font-size: 0.83rem;
+    margin-bottom: 1px;
+    color: #4a4a4a;
+}
+
+.data-item-title {
+    color: #8a8a8a;
+    font-weight: bold;
+}
+
+.data-item-value {
+    color: #363636;
+    font-weight: 400;
+}
+
+.one-line {
+    white-space: nowrap;
+    /* Prevent text from wrapping to the next line */
+    overflow: hidden;
+    /* Hide the overflowed text */
+    text-overflow: ellipsis;
+    /* Add "..." for the truncated content */
+    width: 200px;
+    /* Set a fixed width to constrain the content */
+}
+
+.modal-content {
+    margin: 10px;
+    background: pink
+}
+
+/* Selected buttons container (as before) */
+.selected-buttons {
+    margin: 20px 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.selected-button {
+    margin: 5px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+
+
+.fade {
+    transition: opacity 0.3s ease;
+    opacity: 0;
+}
+
+.visible {
+    display: flex;
+    opacity: 1;
+}
+
+.title-header {
+    font-size: 1.5rem;
+    color: #333;
+    text-align: center;
+    margin: 20px 0;
+}
+
+/* Third set: Input fields layout */
+.input-set {
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.input-field {
+    margin-bottom: 15px;
+    width: 70%;
+}
+
+.modal-card {
+    width: 90%;
+    max-width: 400px;
+}
+
+.notify-msg {
+    height: auto;
+    font-size: 1rem;
+    /* visibility: hidden; */
+}
+
+.notify-msg.success {
+    color: #33691e;
+    visibility: visible;
+}
+
+.notify-msg.error {
+    color: #cd5244;
+    visibility: visible;
+}
+
+/* dynamic buttons */
+.custom-button {
+    margin-bottom: 10px;
+    color: #3273dc;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(50, 115, 220, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    width: 50%;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.custom-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 8px rgba(50, 115, 220, 0.3);
+}
+
+.selected-label {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #3273dc;
+    background-color: #e6f7ff;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(50, 115, 220, 0.2);
+    margin-bottom: 20px;
+}
+
+/* .button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+} */
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+/* add transaction style */
+.container {
+    padding: 10px
+}
+
+.section-container {
+    margin-bottom: 20px;
+}
+
+.label-container {
+    text-align: left;
+    font-size: 16px;
+    color: #004080;
+    width: 100%;
+    display: block;
+    padding-bottom: 2px;
+}
+
+.brand {
+
+    padding: 10px 0
+}
+
+.brand p {
+    margin-top: -6px;
+}
+
+.title-container {
+    text-align: left;
+    font-size: 26px;
+    font-weight: bold;
+    color: #004080;
+    width: 100%;
+    display: block;
+    padding: 0;
+
+}
+
+form .input {
+    width: 100%;
+    max-width: 200px;
+    text-align: left;
+    border: 1px solid #ADD8E6;
+    color: #485fc7;
+    font-weight: bold;
+}
+
+.input-container:focus {
+    background-color: transparent !important;
+    color: #004080 !important;
+    font-weight: bold;
+    border: 2px solid #002050;
+    outline: none;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.button-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: left;
+    gap: 8px;
+}
+
+/* .button-active {
+    background-color: #004080;
+    color: white;
+    font-weight: bold;
+    border: 2px solid #002050;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+} */
+
+.button i {
+    padding-right: 0px
+}
+
+.form-buttons {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+input {
+    border: 1px solid #ADD8E6;
+}
+
+.form-buttons button {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 4px;
+    border: 2px solid #004080;
+
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%;
+}
+
+
+.form-buttons #resetBtn {
+    background-color: #ffdd57;
+    /* Bulma warning color */
+    color: #004080;
+    border-color: #004080;
+}
+
+
+.reset-button:hover {
+    background-color: #ffcc00;
+    /* Slightly darker yellow on hover */
+}
+
+.btn-outline {
+    width: 30%;
+    max-width: 150px;
+    border: 1px solid #ADD8E6;
+    color: #485fc7;
+    font-weight: bold;
+}
+
+.button-active {
+    background-color: #485fc7 !important;
+    /* Bulma's is-link color */
+    color: white !important;
+    font-weight: bold;
+    border: 2px solid #002050;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+
+/* TRANSACTION LIST WITH FILTER STYLE */
+body,
+.container,
+.section,
+.filter-container {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    background-color: 0;
+}
+
+/* Filter modal content styling */
+.filter-container {
+    display: flex;
+
+    padding: 0rem;
+}
+
+.filter-options {
+    flex: 1;
+    background-color: #f9f9f9;
+    padding: 0 1rem;
+}
+
+.filter-options ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.filter-options li {
+    padding: 0.75rem 0;
+    cursor: pointer;
+}
+
+.filter-options li.active {
+    font-weight: bold;
+    color: #3273dc;
+}
+
+.filter-data {
+    flex: 2;
+    padding: 0.8rem 1rem;
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
+.filter-buttons {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.filter-btn-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.filter-btn-container button {
+    margin: 0 0.2rem
+}
+
+/* Panels for each filter option */
+.filter-panel {
+    display: none;
+}
+
+.filter-panel.active {
+    display: block;
+}
+
+/* Card Layout */
+.card {
+    padding: 0.5rem 0.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    /* Light border */
+    border-radius: 6px;
+    /* Rounded corners */
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    /* Soft shadow */
+    position: relative;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s ease-in-out;
+    cursor: pointer;
+    margin: 8px
+}
+
+/* Highlight when clicked */
+.card.selected {
+    background-color: #f8f8f8;
+    /* Very light gray */
+}
+
+/* Left section - category icon */
+.icon-container {
+    width: 10%;
+    display: flex;
+    align-items: center;
+    /* Vertical center */
+    justify-content: center;
+    /* Horizontal center */
+    font-size: 1.3rem;
+    /* Smaller icon size */
+    padding-right: 1rem;
+}
+
+/* Right section - transaction details */
+.details-container {
+    width: 90%;
+    font-size: 0.75rem;
+    /* Smaller transaction text */
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    /* More compact spacing */
+}
+
+.amount {
+    font-size: 0.85rem;
+    /* Bold but compact */
+    font-weight: bold;
+    color: green;
+}
+
+.small-text {
+    font-size: 0.7rem;
+    /* Smaller font for date & card */
+    color: #666;
+}
+
+.card.selected {
+    background-color: #e1e1e1
+}
+
+.top-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px;
+}
+
+.control {
+    position: relative;
+    /* Ensures .clear-icon is positioned correctly */
+}
+
+.clear-icon {
+    display: none;
+    position: absolute;
+    right: 40px;
+    /* Adjust for better positioning */
+    cursor: pointer;
+    font-size: 12px;
+    color: #aaa;
+    pointer-events: all;
+    /* Ensure clicks register */
+    z-index: 10;
+    /* Makes sure it's on top */
+}
+
+.section {
+    margin: 10px;
+}
