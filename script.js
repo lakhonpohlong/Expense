@@ -1,5 +1,5 @@
 const apiUrl = CONFIG.API_URL;
-const colorPalletes = ["#ecf5fc", "#e8f7e6", "#fceced", "#fff8dc"];
+const colorPalletes = ["#ecf5fc", "#e8f7e6", "#fceced", "#fff8dc", "#d6e6ff", "#ffffea", "#e5d4ef", "##d1dbe4"];
 let currentPage = 1;
 const ITEMS_PER_PAGE = 50; // Number of items per 
 let transactionData = [];
@@ -141,18 +141,69 @@ function handleModal(modalId, action) {
         } else if (action === 'close') {
             modal.classList.remove('is-active');
             isEditing = false;
-            form.reset()
+            if (form) {
+                form.reset()
+            }
         }
     }
-    console.log("isEditing" + isEditing);
+    // console.log("isEditing" + isEditing);
 
 }
+function handleModalWithCheckbox(modalId, action) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        if (action === 'open') {
+            // Load the checkboxes dynamically first
+            createInputData(cardList, "panel-payment")
+            createInputData(categoryList, "panel-category")
+
+            const savedFiltersRaw = localStorage.getItem("selectedFilters");
+            if (savedFiltersRaw !== null) {
+                // Parse JSON and ensure defaults
+                const savedFilters = savedFiltersRaw ? JSON.parse(savedFiltersRaw) : { payment: [] };
+
+                setTimeout(() => {
+                    document.querySelectorAll(".payment-checkbox").forEach(cb => {
+                        cb.checked = savedFilters.payment.includes(cb.value);
+                    });
+                    document.querySelectorAll(".category-checkbox").forEach(cb => {
+                        cb.checked = savedFilters.category.includes(cb.value);
+                    });
+                    //console.log(saveFilters.payment);
+                    document.getElementById("dateFromModal").value = document.getElementById("dateFromModal").getAttribute("data-selected") || "";
+                    document.getElementById("dateToModal").value = document.getElementById("dateToModal").getAttribute("data-selected") || "";
+                }, 50);
+            } // Wait for checkboxes to load
+            modal.classList.add('is-active');
+        } else if (action === 'close') {
+            const selectedBanks = Array.from(document.querySelectorAll(".payment-checkbox:checked")).map(cb => cb.value);
+            const selectedCategories = Array.from(document.querySelectorAll(".category-checkbox:checked")).map(cb => cb.value);
+            const dateFrom = document.getElementById("dateFromModal").value;
+            const dateTo = document.getElementById("dateToModal").value;
+            localStorage.setItem("selectedFilters", JSON.stringify({
+                payment: selectedBanks, dateFrom, dateTo, category: selectedCategories
+            }))
+
+            console.log("Saved Filters:");
+            console.log("Banks:", selectedBanks);
+            console.log("Categories:", selectedCategories);
+            console.log("Date From:", dateFrom);
+            console.log("Date To:", dateTo);
+
+
+            modal.classList.remove('is-active');
+        }
+    }
+    // console.log("isEditing" + isEditing);
+}
+
 
 // Event listeners for opening modals
 document.querySelectorAll('[data-modal]').forEach(button => {
     button.addEventListener('click', function () {
         const modalId = this.getAttribute('data-modal');
-        handleModal(modalId, 'open');
+        //handleModal(modalId, 'open');
+        handleModalWithCheckbox(modalId, 'open')
     });
 });
 
@@ -344,7 +395,7 @@ function loadTableData(module, tableId) {
 
         .catch(error => {
             console.error("Error loading data:", error);
-            document.getElementById('error-message').classList.remove('is-hidden');
+            // document.getElementById('error-message').classList.remove('is-hidden');
         });
 }
 
@@ -401,6 +452,10 @@ function formatDateToDDMMYY(isoTimestamp) {
     let year = String(date.getFullYear());
 
     return `${day}-${month}-${year}`;
+}
+function formatDate(isoTimeStamp) {
+    const date = new Date(isoTimeStamp);
+    return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 function utilizedPercent(utilized, limit) {
     const utilizedPer = utilized / limit * 100;
@@ -517,6 +572,7 @@ window.onload = fetchData;
 
 // google login
 document.addEventListener("DOMContentLoaded", () => {
+    localStorage.removeItem("selectedFilters");
     setTimeout(() => {
         initGoogleLogin();
         loadEmailFromCookie();
@@ -859,6 +915,7 @@ function renderTransactions(isFilter, page) {
     const transactionContainer = document.getElementById("transactions");
     transactionContainer.innerHTML = "";
     const totalDiv = document.createElement("div");
+    const scrollContainer = document.createElement("div");
     totalDiv.classList.add("is-flex", "is-justify-content-space-between", "px-4", "pt-4");
 
     let totalData = 0;
@@ -873,26 +930,28 @@ function renderTransactions(isFilter, page) {
     }
     totalDiv.innerHTML = `
     <p class="is-size-7 has-text-weight-bold pl-2 is-italic">${pStr}</p>
-    <p class="is-size-7 has-text-weight-bold pl-2 is-italic">Displaying ${start} to ${end} records.</p>
+    <p class="is-size-7 has-text-weight-bold pl-2 is-italic">Displaying ${start} to ${end} records of ${filterTransactionData.length}</p>
     `
+    scrollContainer.innerHTML = `<div class="scroll-container " id="scrollContainer"></div>`
     transactionContainer.appendChild(totalDiv)
+    transactionContainer.appendChild(scrollContainer)
     transactions.forEach(transaction => {
         let category = getCategoryDetails(transaction.spendCategory)
         const card = document.createElement("div");
-        card.className = "card";
+        card.classList.add("card", "is-flex");
         card.innerHTML = `
-        <div class="icon-container has-text-info">
+        <div class="" style="width: 10%;">
             <span class="icon ${category.color}">
                 <i class="fas ${category.icon}"></i>
             </span>
       </div>
-        <div class="details-container">
-            <div class="row">
-                <span class="is-size-6 one-line  has-text-weight-bold">${capitalizeFirstLetter(transaction.item)}</span>
+        <div class="is-flex is-flex-direction-column" style="width: 90%;">
+            <div class="is-flex is-justify-content-space-between">
+                <span class=" one-line  has-text-semi-bold">${capitalizeFirstLetter(transaction.item)}</span>
                 <span class="amount has-text-info">${formatAmountInINR(transaction.amount)}</span>
             </div>
-            <div class="row">
-                <span class="is-size-7">Paid on ${formatDateToDDMMYY(transaction.date)}</span>
+            <div class="is-flex is-justify-content-space-between">
+                <span class="is-size-7">Paid on ${formatDate(transaction.date)}</span>
                 <span class="is-size-7">${transaction.card}</span>
             </div>
         </div>
@@ -900,8 +959,8 @@ function renderTransactions(isFilter, page) {
 
         // Add click event listener to highlight selected card
         card.addEventListener("click", function () {
-            document.querySelectorAll(".card").forEach(c => c.classList.remove("selected")); // Remove highlight from all
-            card.classList.add("selected"); // Highlight clicked card
+            document.querySelectorAll(".card").forEach(c => c.classList.remove("selected-card")); // Remove highlight from all
+            card.classList.add("selected-card"); // Highlight clicked card
         });
 
         transactionContainer.appendChild(card);
@@ -910,71 +969,18 @@ function renderTransactions(isFilter, page) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+
     // renderTransactions(transactions)
 })
 
-// Modal open and close functionality
-const openFilterBtn = document.getElementById('openFilterBtn');
-const filterModal = document.getElementById('filterModal');
-const closeModalBtn = document.getElementById('closeModalBtn');
-const cancelModalBtn = document.getElementById('cancelModalBtn');
-
-function openModal() {
-    filterModal.classList.add('is-active');
-    //FilterList(transactions, )
-    createInputData(cardList, "panel-card")
-    createInputData(categoryList, "panel-category")
-}
-
-function closeModal() {
-    filterModal.classList.remove('is-active');
-}
-
-openFilterBtn.addEventListener('click', openModal);
-closeModalBtn.addEventListener('click', closeModal);
-cancelModalBtn.addEventListener('click', closeModal);
-
-// Panel switching for the filter options
-const options = document.querySelectorAll('#filterOptions li');
-const panels = {
-    cards: document.getElementById('panel-card'),
-    daterange: document.getElementById('panel-daterange'),
-    category: document.getElementById('panel-category'),
-};
-
-options.forEach(item => {
-    item.addEventListener('click', () => {
-        options.forEach(i => i.classList.remove('active'));
-        item.classList.add('active');
-        const type = item.getAttribute('data-type');
-        Object.values(panels).forEach(panel => panel.classList.remove('active'));
-        if (panels[type]) {
-            panels[type].classList.add('active');
-        }
-    });
-});
-
-// Clear All button: reset all input selections within the filter modal
-const clearAllBtn = document.getElementById('clearAllBtn');
-clearAllBtn.addEventListener('click', () => {
-    // Reset checkboxes
-    document.querySelectorAll('.filter-data input[type="checkbox"]').forEach(checkbox => {
-        checkbox.checked = false;
-    });
-    // Reset date fields
-    document.querySelectorAll('.filter-data input[type="date"]').forEach(dateField => {
-        dateField.value = '';
-    });
-});
-
-// Apply button: add any filtering logic as required and then close the modal
-const applyFilterBtn = document.getElementById('applyFilterBtn');
-applyFilterBtn.addEventListener('click', () => {
-    // Insert filtering logic (e.g., update transactions table) here
-
-    // Close the modal after applying filters
-    closeModal();
-});
+// // Apply button: add any filtering logic as required and then close the modal
+// const applyFilterBtn = document.getElementById('applyFilterBtn');
+// applyFilterBtn.addEventListener('click', () => {
+//     // Insert filtering logic (e.g., update transactions table) here
+//     searchTransactionB()
+//     // Close the modal after applying filters
+//     closeModal();
+// });
 
 function createInputData(list, elementId) {
     const container = document.getElementById(elementId);
@@ -985,7 +991,10 @@ function createInputData(list, elementId) {
         elementFilter.innerHTML = `
         <div class="field">
             <label class="checkbox">
-                <input type="checkbox" name="${elementId.split("-").pop()}" value="${item}"> ${item}
+                <input type="checkbox" class="${elementId.split("-").pop()}-checkbox" name="${elementId.split("-").pop()}"  value="${item}"
+                data-${elementId.split("-").pop()}-id="${item}"
+                >
+                <span class="pl-2"> ${item}</span>
             </label>
         </div>
         `;
@@ -1033,17 +1042,149 @@ const filterTransactionsB = (selectedCards, selectedCategories, dateFrom, dateTo
 
 const searchTransactionB = () => {
     currentPage = 1;
-    const selectedCards = Array.from(document.querySelectorAll("input[name='card']:checked")).map(c => c.value);
+    const selectedCards = Array.from(document.querySelectorAll("input[name='payment']:checked")).map(c => c.value);
     const selectedCategories = Array.from(document.querySelectorAll("input[name='category']:checked")).map(c => c.value);
-    const dateFrom = document.getElementById("dateFrom").value;
-    const dateTo = document.getElementById("dateTo").value;
+    const dateFrom = document.getElementById("dateFromModal").value;
+    const dateTo = document.getElementById("dateToModal").value;
+    console.log(selectedCards);
 
     filterTransactionData = filterTransactionsB(selectedCards, selectedCategories, dateFrom, dateTo, transactionData);
     // Close the modal after applying filters
-    document.getElementById('filterModal').classList.remove('is-active');
+    document.getElementById('filter-modal').classList.remove('is-active');
 
     renderTransactions(true, currentPage);
     //     document.getElementById("result").innerText = results.length
     //         ? `Matches found: \n${ JSON.stringify(results, null, 2) } `
     //         : "No matching transactions found.";
 };
+
+function showNavItemData(sec) {
+
+    // Hide all sections first
+    document.querySelectorAll(".modal-content > div").forEach(el => el.style.display = "none");
+
+    // Show the selected section
+    document.getElementById("panel-" + sec).style.display = "block";
+    // Update the active state on the navigation menu
+    document.querySelectorAll(".menu-list li").forEach(el => el.classList.remove("is-active"));
+    console.log("nav" + sec.charAt(0).toUpperCase() + sec.slice(1))
+    document.getElementById("nav" + sec.charAt(0).toUpperCase() + sec.slice(1)).classList.add("is-active");
+}
+
+
+// Apply filters: update the dynamic button list and close the modal
+function applyFilters() {
+    searchTransactionB()
+    updateDynamicButtons();
+    handleModalWithCheckbox("filter-modal", "close")
+}
+
+// Build dynamic button list based on selected filters
+function updateDynamicButtons() {
+    const cont = document.getElementById("scrollContainer");
+    cont.innerHTML = "";
+    let cnt = 0;
+
+    // Date filter – format as "May 10 - May 15"
+    const df = document.getElementById("dateFromModal").value, dt = document.getElementById("dateToModal").value;
+    if (df || dt) {
+        const fmt = d => new Date(d).toLocaleString("en-IN", { month: "short", day: "numeric" });
+        const text = `${df ? fmt(df) : "N/A"} - ${dt ? fmt(dt) : "N/A"}`;
+        const btn = document.createElement("button");
+        btn.className = "remove-btn";
+        btn.innerHTML = `${text} <span class="icon" onclick="removeDate(event)">✖</span>`;
+        const div = document.createElement("div");
+        div.className = "button-container";
+        div.appendChild(btn);
+        cont.appendChild(div);
+        cnt++;
+    }
+
+    // Payment Source filters
+    document.querySelectorAll(".payment-checkbox:checked").forEach(chk => {
+        const btn = document.createElement("button");
+        btn.className = "remove-btn";
+        btn.setAttribute("data-payment-id", chk.getAttribute("data-payment-id"));
+        btn.innerHTML = chk.value + ` <span class="icon" onclick="removeFilter(event, 'payment', '${chk.getAttribute("data-payment-id")}')">✖</span>`;
+        const div = document.createElement("div");
+        div.className = "button-container";
+        div.appendChild(btn);
+        cont.appendChild(div);
+        cnt++;
+    });
+
+    // Category filters
+    document.querySelectorAll(".category-checkbox:checked").forEach(chk => {
+        const btn = document.createElement("button");
+        btn.className = "remove-btn";
+        btn.setAttribute("data-category-id", chk.getAttribute("data-catategory-id"));
+        btn.innerHTML = chk.value + ` <span class="icon" onclick="removeFilter(event, 'category', '${chk.getAttribute("data-category-id")}')">✖</span>`;
+        const div = document.createElement("div");
+        div.className = "button-container";
+        div.appendChild(btn);
+        cont.appendChild(div);
+        cnt++;
+    });
+
+    // Append separator and Clear All button only if there are any filters
+    if (cnt > 1) {
+        const sep = document.createElement("span");
+        sep.className = "separator";
+        sep.textContent = "|";
+        cont.appendChild(sep);
+
+        const clrDiv = document.createElement("div");
+        clrDiv.className = "button-container";
+        const clrBtn = document.createElement("button");
+        clrBtn.className = "clearAll-btn";
+        clrBtn.textContent = "Clear All";
+        clrBtn.onclick = clearAll;
+        clrDiv.appendChild(clrBtn);
+        cont.appendChild(clrDiv);
+    }
+}
+
+// Remove a bank or category filter when its remove icon is clicked
+function removeFilter(e, type, id) {
+    console.log(id);
+    const savedFilters = JSON.parse(localStorage.getItem("selectedFilters") || {})
+    e.stopPropagation();
+    if (type === "payment") {
+        const chk = document.querySelector(`.payment-checkbox[data-payment-id="${id}"]`);
+        if (chk) chk.checked = false;
+        savedFilters.payment = savedFilters.payment.filter(item => item !== id)
+
+    } else if (type === "category") {
+        const chk = document.querySelector(`.category-checkbox[data-category-id="${id}"]`);
+        if (chk) chk.checked = false;
+        savedFilters.category = savedFilters.category.filter(item => item !== id)
+    }
+    localStorage.setItem("selectedFilters", JSON.stringify(savedFilters))
+    searchTransactionB()
+    updateDynamicButtons();
+
+
+}
+
+// Remove date filter: clear both date inputs
+function removeDate(e) {
+    const savedFilters = JSON.parse(localStorage.getItem("selectedFilters") || {})
+    e.stopPropagation();
+    document.getElementById("dateFromModal").value = "";
+    document.getElementById("dateToModal").value = "";
+    savedFilters.dateFrom = "";
+    savedFilters.dateTo = "";
+    localStorage.setItem("selectedFilters", JSON.stringify(savedFilters))
+    searchTransactionB()
+    updateDynamicButtons();
+}
+
+// Clear all filters
+function clearAll() {
+    document.querySelectorAll(".payment-checkbox, .category-checkbox").forEach(chk => chk.checked = false);
+    document.getElementById("dateFromModal").value = "";
+    document.getElementById("dateToModal").value = "";
+    localStorage.setItem("selectedFilters", JSON.stringify({ payment: [], dateFrom: "", dateTo: "", category: [] }))
+    updateDynamicButtons();
+    searchTransactionB();
+}

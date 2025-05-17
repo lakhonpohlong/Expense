@@ -42,8 +42,9 @@ nav a {
 
 .container2 {
     margin-top: 20px;
-
+    width: 100%;
 }
+
 
 /* Custom styles for compact design with background */
 .card-details {
@@ -512,4 +513,13 @@ body,
 
 .section {
     margin: 10px;
+    /* background-color: pink; */
+    width: 100%;
+}
+
+.centerAll,
+.containerd {
+    width: 100%;
+
+    /* background-color: #002050; */
 }

@@ -7,166 +7,513 @@
   <title>Expense Tracker</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="stylesRR.css">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    body,
+    .section {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+    }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      /* Sticks to the top of the viewport */
+      z-index: 1000;
+      /* Ensures it stays above other content */
+      /* Optional: adds subtle shadow */
+      text-align: center;
+    }
+
+    .navbar-menu {
+      height: 50px;
+      background-color: rgb(237, 242, 237) !important;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+      padding-top: 60px;
+
+    }
+
+
+
+    /* Highlight selected nav item */
+    .selected {
+      font-weight: bold;
+      color: #3273dc;
+      text-decoration: none;
+    }
+
+    /* Hide sections by default */
+    .section {
+      display: none;
+      padding: 20px;
+    }
+
+    /* Show active section */
+    .active {
+      display: block;
+    }
+
+    /* Custom styles for compact design with background */
+    .card-details {
+      border-radius: 8px;
+      padding: 8px;
+      margin-bottom: 0px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+      color: #363636;
+      text-align: center;
+    }
+
+    .titleHead {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .data-item {
+      font-size: 0.83rem;
+      margin-bottom: 1px;
+      color: #4a4a4a;
+    }
+
+    .data-item-title {
+      color: #8a8a8a;
+      font-weight: bold;
+    }
+
+    .data-item-value {
+      color: #363636;
+      font-weight: 400;
+    }
+
+    .clear-icon {
+      display: none;
+      position: absolute;
+      right: 40px;
+      /* Adjust for better positioning */
+      cursor: pointer;
+      font-size: 12px;
+      color: #aaa;
+      pointer-events: all;
+      /* Ensure clicks register */
+      z-index: 10;
+      /* Makes sure it's on top */
+    }
+
+    /* Card Layout */
+    .card {
+      padding: 0.5rem 0.8rem;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      /* Light border */
+      border-radius: 6px;
+      /* Rounded corners */
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      /* Soft shadow */
+      transition: background-color 0.3s ease-in-out;
+      cursor: pointer;
+      margin: 8px 0;
+    }
+
+    .has-text-semi-bold {
+      font-weight: 600;
+      /* Semi-bold weight */
+      font-size: 0.94rem;
+    }
+
+    /* Highlight when clicked */
+    .card.selected-card {
+      background-color: #E0E0E0;
+      /* Very light gray */
+    }
+
+    /* Left section - category icon */
+    .icon-container {
+      width: 10%;
+      display: flex;
+      align-items: center;
+      /* Vertical center */
+      justify-content: center;
+      /* Horizontal center */
+      font-size: 1.3rem;
+      /* Smaller icon size */
+      padding-right: 1rem;
+    }
+
+    /* Right section - transaction details */
+    .details-container {
+      width: 90%;
+      font-size: 0.75rem;
+      /* Smaller transaction text */
+    }
+
+    .columns {
+      display: flex !important;
+      /* Forces single-row layout */
+      flex-wrap: nowrap;
+      /* Prevents elements from wrapping */
+    }
+
+    .one-line {
+      white-space: nowrap;
+      /* Prevent text from wrapping to the next line */
+      overflow: hidden;
+      /* Hide the overflowed text */
+      text-overflow: ellipsis;
+      /* Add "..." for the truncated content */
+      width: 15rem;
+      /* Set a fixed width to constrain the content */
+    }
+
+    .filter-options {
+      flex: 1;
+      background-color: #f9f9f9;
+      padding: 0 1rem;
+    }
+
+    .filter-options ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    .filter-options li {
+      padding: 0.75rem 0;
+      cursor: pointer;
+    }
+
+    .filter-options li.active {
+      font-weight: bold;
+      color: #3273dc;
+    }
+
+    .filter-data {
+      flex: 2;
+      padding: 0.8rem 1rem;
+      overflow-x: hidden;
+      max-width: 100%;
+    }
+
+    .filter-buttons {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+    }
+
+    /* Panels for each filter option */
+    .filter-panel {
+      display: none;
+    }
+
+    .filter-panel.active {
+      display: block;
+    }
+
+
+    /* filter modal */
+    /* Dynamic Buttons Container */
+    .scroll-container {
+      width: 100%;
+      overflow-x: auto;
+      white-space: nowrap;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      scroll-behavior: smooth;
+    }
+
+    .button-container {
+      display: inline-block;
+      margin: 5px;
+      position: relative;
+    }
+
+    .remove-btn {
+      background: #3ca8e6;
+      color: white;
+      border: none;
+      padding: 0px 0px 0px 8px;
+      font-size: 0.8em;
+      cursor: pointer;
+      border-radius: 20px;
+      transition: background 0.3s;
+    }
+
+    .clearAll-btn {
+      background: #3ca8e6;
+      color: white;
+      border: none;
+      padding: 3px 6px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: background 0.3s;
+    }
+
+    #scrollContainer {
+      margin-bottom: -10px;
+      height: 40px;
+    }
+
+    .input-check {
+      padding: 0.5rem;
+    }
+
+    .separator {
+      font-size: 1.2em;
+      color: #ccc;
+      padding: 0 10px;
+      font-weight: bold;
+    }
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    .modal-card-body {
+      min-height: 20rem;
+      width: 100%;
+    }
+
+    /* Modal split: left (35%) navigation, right (65%) content */
+    .modal-nav {
+      flex: 0 0 33%;
+      max-width: 33%;
+      border-right: 1px solid #eee;
+    }
+
+    .modal-content {
+      flex: 0 0 66%;
+      max-width: 66%;
+    }
+
+    @media screen and (max-width: 768px) {
+
+      .modal-nav,
+      .modal-content {
+        flex: 0 0 33%;
+        max-width: 33%;
+      }
+
+      .modal-content {
+        flex: 0 0 66%;
+        max-width: 66%;
+      }
+    }
+
+    .menu-list li {
+      cursor: pointer;
+      padding: 0.3rem 0;
+    }
+
+    .menu-list li.is-active {
+      font-weight: bold;
+      color: #3273dc;
+    }
+
+    .date-group {
+      position: relative;
+      margin-bottom: 15px;
+    }
+
+    .date-label {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      transition: all 0.3s ease;
+      color: #888;
+      font-size: 0.6em;
+      pointer-events: none;
+    }
+
+    .date-input {
+      width: 90%;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      outline: none;
+      font-size: 1em;
+    }
+
+    .date-input:focus+.date-label,
+    .date-input:not(:placeholder-shown)+.date-label {
+      top: 5px;
+      left: 10px;
+      font-size: 0.75em;
+      color: #555;
+    }
+  </style>
 </head>
 
 <body>
-  <!-- Light Navbar -->
-  <nav class="navbar-custom">
-    <div class="container">
-      <a class="nav-item active" href="#" id="homeNav" onclick="showSection('home','homeNav')">Home</a>
-      <a class="nav-item" href="#" id="profileNav" onclick="showSection('profile','profileNav')">Profile</a>
-      <a class="nav-item" href="#" id="credit-cardNav" onclick="showSection('credit-card','credit-cardNav')">Card</a>
-      <a class="nav-item" id="transactionNav" onclick="showSection('transaction','transactionNav')">Transaction</a>
-      <a class="nav-item" id="settingNav" href="#" onclick="showSection('setting','settingNav')">Setting</a>
+
+  <!-- Navbar -->
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-menu is-align-items-center  is-active">
+      <div class="navbar-start is-flex is-justify-content-space-around is-align-items-center">
+        <a class="navbar-item selected" href="#" data-target="home">Home</a>
+        <a class="navbar-item" href="#" data-target="profile">Profile</a>
+        <a class="navbar-item" href="#" data-target="card">Card</a>
+        <a class="navbar-item" href="#" data-target="transaction">Transaction</a>
+        <a class="navbar-item" href="#" data-target="setting">Setting</a>
+      </div>
     </div>
   </nav>
-  <main class="container2">
-    <section id="home" class="section active">
-      <div class="titleHead">Credit Card Details</div>
-      <div class="columns is-mobile is-multiline" id="dashboard-content">
-      </div>
-    </section> <!-- start profile section -->
-    <section id="profile" class="section">
-      <div class="is-flex is-flex-row is-justify-content-space-between">
-        <div class="titleHead">Profile List</div>
-        <button class="button modal-button" id="addBtn" data-modal="profile-modal"><i class="fas fa-plus"></i>
-          <span class="pl-1">Add Profile</span>
-        </button>
-      </div>
-      <table class="table is-striped is-hoverable is-fullwidth">
-        <thead>
-          <tr>
-            <th>Full Name</th>
-            <th>Salary</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="profile-table">
-        </tbody>
-      </table>
-    </section>
 
-    <section id="credit-card" class="section">
-      <div class="is-flex is-flex-row is-justify-content-space-between">
-        <div class="titleHead">Credit Card List</div>
-        <button class="button modal-button" id="addBtn" data-modal="credit-card-modal"><i class="fas fa-plus"></i>
-          <span class="pl-1">Add New</span>
-        </button>
-      </div>
-      <table class="table is-striped is-hoverable">
-        <thead>
-          <tr>
-            <th class="is-size-7-mobile">Card</th>
-            <th class="is-size-7-mobile">Limit</th>
-            <th class="is-size-7-mobile">Utilized</th>
-            <th class="is-size-7-mobile">Rem.</th>
-            <th class="is-size-7-mobile">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="credit-card-table">
-        </tbody>
-      </table>
-    </section>
-    <!-- transaction section -->
-    <section id="transaction" class="section">
-      <!-- <div class="box" id="transaction-list">
+
+  <section id="home" class="section active">
+    <div class="titleHead">Credit Card Details</div>
+    <div class="columns is-mobile is-multiline" id="dashboard-content">
+    </div>
+  </section> <!-- start profile section -->
+  <section id="profile" class="section">
+    <div class="row is-flex is-flex-row is-justify-content-space-between">
+      <div class="titleHead">Profile List</div>
+      <button class="button modal-button" id="addBtn" data-modal="profile-modal"><i class="fas fa-plus"></i>
+        <span class="pl-1">Add Profile</span>
+      </button>
+    </div>
+    <table class="table is-striped is-hoverable is-fullwidth">
+      <thead>
+        <tr>
+          <th>Full Name</th>
+          <th>Salary</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="profile-table">
+      </tbody>
+    </table>
+  </section>
+
+  <section id="card" class="section">
+    <div class="is-flex is-flex-row is-justify-content-space-between">
+      <div class="titleHead">Credit Card List</div>
+      <button class="button modal-button" id="addBtn" data-modal="credit-card-modal"><i class="fas fa-plus"></i>
+        <span class="pl-1">Add New</span>
+      </button>
+    </div>
+    <table class="table is-striped is-hoverable">
+      <thead>
+        <tr>
+          <th class="is-size-7-mobile">Card</th>
+          <th class="is-size-7-mobile">Limit</th>
+          <th class="is-size-7-mobile">Utilized</th>
+          <th class="is-size-7-mobile">Rem.</th>
+          <th class="is-size-7-mobile">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="credit-card-table">
+      </tbody>
+    </table>
+  </section>
+  <!-- transaction section -->
+  <section id="transaction" class="section">
+    <!-- <div class="box" id="transaction-list">
         Transactions will be dynamically inserted here -->
-      <div class="container">
-        <div class="top-container">
-          <h1 class="title is-size-6">Transaction History</h1>
 
-          <!-- Filter Button -->
-          <div class="filter-btn-container">
-            <div class="control has-icons-left">
-              <input class="input is-rounded is-small" id="searchInput" type="text" onkeyup="searchTransaction()"
-                placeholder="Search...">
-              <span class="icon is-small is-left">
-                <i class="fas fa-search"></i>
-              </span>
-              <span class="icon is-small is-right">
-                <i class="fas fa-times clear-icon"></i>
-              </span>
-            </div>
-            <button class="button is-info is-small" id="reloadBtn"><span><i class="fas fa-sync"></i></span></button>
-            <button class="button is-info is-small" id="addTransactionBtn"
-              onclick="showSection('addTransaction','transactionNav')"><span><i class="fas fa-plus"></i></span>
-            </button>
-            <button class="button is-info is-small" id="openFilterBtn"><span><i
-                  class="fas fa-filter"></i></span></button>
+    <div class="top-container">
+      <h1 class="title is-size-6">Transaction History</h1>
+      <!-- Filter Button -->
+      <div class="filter-btn-containerd is-flex is-justify-content-space-between">
+        <div class="control has-icons-left">
+          <input class="input is-rounded is-small" id="searchInput" type="text" onkeyup="searchTransaction()"
+            placeholder="Search...">
+          <span class="icon is-small is-left">
+            <i class="fas fa-search"></i>
+          </span>
+          <span class="icon is-small is-right">
+            <i class="fas fa-times clear-icon"></i>
+          </span>
+        </div>
+        <button class="button is-info is-small" id="reloadBtn"><span><i class="fas fa-sync"></i></span></button>
+        <button class="button is-info is-small" id="addbtn"><span><i class="fas fa-plus"></i></span>
+        </button>
+        <button class="button is-info is-small" id="openFilterBtn" data-modal="filter-modal"><span><i
+              class="fas fa-filter"></i></span></button>
+      </div>
+    </div>
+    <!-- Transaction Cards -->
+    <div id="transactions"></div>
+    </div>
+    <div class="pagination-controls" id="pagination-controls">
+      <!-- Pagination buttons will be dynamically inserted here -->
+    </div>
+  </section>
+  <section id="addTransaction" class="section">
+    <div class="container">
+      <div class="brand">
+        <h3 class="title-container">Expense Tracker</h3>
+        <p>Record your Transaction here</p>
+      </div>
+      <form id="transaction-form">
+        <!-- Date Selection -->
+        <div class="section-container">
+          <label class="label-container" for="date-picker">Transaction Date:</label>
+          <input type="date" id="date-picker" class="input is-small">
+        </div>
+
+        <!-- Bank Selection -->
+        <div class="section-container">
+          <label class="label-container">Select Payment Card:</label>
+          <div class="button-container" id="bankSet">
+
           </div>
         </div>
-        <!-- Transaction Cards -->
-        <div id="transactions"></div>
-      </div>
-      </div>
-      <div class="pagination-controls" id="pagination-controls">
-        <!-- Pagination buttons will be dynamically inserted here -->
-      </div>
-    </section>
-    <section id="addTransaction" class="section">
-      <div class="container">
-        <div class="brand">
-          <h3 class="title-container">Expense Tracker</h3>
-          <p>Record your Transaction here</p>
+
+        <!-- Category Selection -->
+        <div class="section-container">
+          <label class="label-container">Choose Expense Category:</label>
+          <div class="button-container" id="categorySet">
+
+          </div>
         </div>
-        <form id="transaction-form">
-          <!-- Date Selection -->
-          <div class="section-container">
-            <label class="label-container" for="date-picker">Transaction Date:</label>
-            <input type="date" id="date-picker" class="input is-small">
-          </div>
 
-          <!-- Bank Selection -->
-          <div class="section-container">
-            <label class="label-container">Select Payment Card:</label>
-            <div class="button-container" id="bankSet">
+        <!-- Enter Item Field -->
+        <div class="section-container">
+          <label class="label-container" for="item-input">Enter Item:</label>
+          <div class="label-container"></div>
+          <input type="text" id="item-input" class="input is-small" placeholder="Enter item name">
+        </div>
 
-            </div>
-          </div>
+        <!-- Enter Amount Field -->
+        <div class="section-container">
+          <label class="label-container" for="amount-input">Enter Amount:</label>
+          <div class="label-container"></div> <input type="number" id="amount-input" class="input is-small"
+            placeholder="Enter amount">
+        </div>
 
-          <!-- Category Selection -->
-          <div class="section-container">
-            <label class="label-container">Choose Expense Category:</label>
-            <div class="button-container" id="categorySet">
-
-            </div>
-          </div>
-
-          <!-- Enter Item Field -->
-          <div class="section-container">
-            <label class="label-container" for="item-input">Enter Item:</label>
-            <div class="label-container"></div>
-            <input type="text" id="item-input" class="input is-small" placeholder="Enter item name">
-          </div>
-
-          <!-- Enter Amount Field -->
-          <div class="section-container">
-            <label class="label-container" for="amount-input">Enter Amount:</label>
-            <div class="label-container"></div> <input type="number" id="amount-input" class="input is-small"
-              placeholder="Enter amount">
-          </div>
-
-          <!-- Form Buttons -->
-          <div class="form-buttons">
-
-            <button type="button" id="submitBtn" class="button is-success" onclick="submitForm(event)">Submit</button>
-            <button type="button" id="resetBttn" class="button is-danger" onclick="resetForm()">Reset</button>
-          </div>
-          <!-- Feedback Message -->
-          <p id="feedback-message"
-            style="display: none; color: green; font-weight: bold; text-align: center; margin-top: 10px;font-size:12px">
-          </p>
-        </form>
-      </div>
-    </section>
-    <section id="setting" class="section">
-      <h2 class="title">Setting</h2>
-      <div id="googleLogin"></div>
-      <p id="email">Your email will appear here after login.</p>
-      <button id="logoutBtn" style="display: none;" onclick="logout()">Logout</button>
-    </section>
+        <!-- Form Buttons -->
+        <div class="form-buttons">
+          <button type="button" id="submitBtn" class="button is-success" onclick="submitForm(event)">Submit</button>
+          <button type="button" id="resetBttn" class="button is-danger" onclick="resetForm()">Reset</button>
+        </div>
+        <!-- Feedback Message -->
+        <p id="feedback-message"
+          style="display: none; color: green; font-weight: bold; text-align: center; margin-top: 10px;font-size:12px">
+        </p>
+      </form>
+    </div>
+  </section>
+  <section id="setting" class="section">
+    <h2 class="title">Setting</h2>
+    <div id="googleLogin"></div>
+    <p id="email">Your email will appear here after login.</p>
+    <button id="logoutBtn" style="display: none;" onclick="logout()">Logout</button>
+  </section>
   </main> <!-- Modals -->
 
   <!-- Modal -->
@@ -249,59 +596,92 @@
     </div>
   </div>
 
-  <!-- Filter Modal (Bulma modal structure) -->
-  <div class="modal" id="filterModal">
+
+
+
+  <!-- new fileter scri=ollable -->
+  <!-- Filter Modal -->
+  <div class="modal" id="filter-modal">
     <div class="modal-background"></div>
     <div class="modal-card">
 
       <header class="modal-card-head">
-        <p class="modal-card-title">Filter by</p>
-        <button class="delete" id="closeModalBtn" aria-label="close"></button>
+        <p class="modal-card-title">Select Filters</p>
+        <button class="delete" aria-label="close" data-close="filter-modal"></button>
       </header>
 
       <section class="modal-card-body">
-        <!-- Filter Content integrated inside modal -->
-        <div class="filter-container">
-          <!-- Left Side: Filter Options -->
-          <div class="filter-options">
-            <ul id="filterOptions">
-              <li data-type="cards" class="active">Payment Source</li>
-              <li data-type="daterange">Date range</li>
-              <li data-type="category">Category</li>
-            </ul>
+        <div class="columns is-mobile">
+          <!-- Left Navigation (35%) -->
+          <div class="column modal-nav">
+            <aside class="menu">
+              <ul class="menu-list">
+
+                <li id="navPayment" class="is-active" onclick="showNavItemData('payment')">
+                  Payment Source
+                </li>
+                <li>
+                <li id="navDate" onclick="showNavItemData('date')">
+                  Date
+                </li>
+                <li>
+                <li id="navCategory" onclick="showNavItemData('category')">
+                  Category
+                </li>
+              </ul>
+            </aside>
           </div>
-          <!-- Right Side: Filter Data Panels -->
-          <div class="filter-data" id="filterData">
-            <!-- Cards Panel -->
-            <div id="panel-card" class="filter-panel active">
 
+          <!-- Right Content (65%) -->
+          <div class="column modal-content" id="modalRightContent">
+            <!-- Payment Source Section -->
+            <div id="panel-payment">
             </div>
 
-            <!-- Date Range Panel -->
-            <div id="panel-daterange" class="filter-panel">
-              <div class="field">
-                <input type="date" name="dateFrom" id="dateFrom" class="input is-small" placeholder="From Date">
+            <!-- Date Section (hidden by default) -->
+            <div id="panel-date" style="display:none;">
+              <div class="date-group">
+                <input type="date" id="dateFromModal" class="date-input" placeholder=" " />
+                <label for="dateFromModal" class="date-label">Date From</label>
               </div>
-              <div class="field">
-                <input type="date" name="dateTo" id="dateTo" class="input is-small" placeholder="To Date">
+
+              <div class="date-group">
+                <input type="date" id="dateToModal" class="date-input" placeholder=" " />
+                <label for="dateToModal" class="date-label">Date To</label>
               </div>
             </div>
 
-            <!-- Category Panel -->
-            <div id="panel-category" class="filter-panel">
+            <!-- Category Section (hidden by default) -->
+            <div id="panel-category" style="display:none;">
             </div>
           </div>
         </div>
       </section>
 
       <footer class="modal-card-foot">
-        <button id="clearAllBtn" class="button">Clear All</button>
-        <button id="applyFilterBtn" class="button is-info" onclick="searchTransactionB()">Apply</button>
-        <button id="cancelModalBtn" class="button">Cancel</button>
+        <button class="button is-success" onclick="applyFilters()">Apply</button>
+        <button class="button" data-close="filter-modal" id="closeModalFooter">Cancel</button>
       </footer>
 
     </div>
   </div>
+
+  <!-- JavaScript for Section Toggle -->
+  <script>
+    document.querySelectorAll('.navbar-item').forEach(item => {
+      item.addEventListener('click', function (event) {
+        event.preventDefault();
+        document.querySelectorAll('.navbar-item').forEach(el => el.classList.remove('selected'));
+        this.classList.add('selected');
+
+        const targetId = this.getAttribute('data-target');
+        document.querySelectorAll('.section').forEach(section => {
+          section.classList.remove('active');
+        });
+        document.getElementById(targetId).classList.add('active');
+      });
+    });
+  </script>
   <script src="config.js"></script>
   <script src="script.js"></script>
 </body>
