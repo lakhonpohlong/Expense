@@ -440,7 +440,8 @@
           </span>
         </div>
         <button class="button is-info is-small" id="reloadBtn"><span><i class="fas fa-sync"></i></span></button>
-        <button class="button is-info is-small" id="addbtn"><span><i class="fas fa-plus"></i></span>
+        <button class="switch-btn button is-info is-small" id="addBtn" data-target="addTransaction"><span><i
+              class="fas fa-plus"></i></span>
         </button>
         <button class="button is-info is-small" id="openFilterBtn" data-modal="filter-modal"><span><i
               class="fas fa-filter"></i></span></button>
@@ -668,7 +669,7 @@
 
   <!-- JavaScript for Section Toggle -->
   <script>
-    document.querySelectorAll('.navbar-item').forEach(item => {
+    document.querySelectorAll('.navbar-item, .switch-btn').forEach(item => {
       item.addEventListener('click', function (event) {
         event.preventDefault();
         document.querySelectorAll('.navbar-item').forEach(el => el.classList.remove('selected'));
@@ -681,6 +682,7 @@
         document.getElementById(targetId).classList.add('active');
       });
     });
+
   </script>
   <script src="config.js"></script>
   <script src="script.js"></script>
