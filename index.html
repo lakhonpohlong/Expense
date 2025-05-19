@@ -355,6 +355,15 @@
       font-size: 0.75em;
       color: #555;
     }
+
+    .button-active {
+      background-color: #485fc7 !important;
+      /* Bulma's is-link color */
+      color: white !important;
+      font-weight: bold;
+      border: 2px solid #002050;
+      box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+    }
   </style>
 </head>
 
@@ -456,59 +465,65 @@
   </section>
   <section id="addTransaction" class="section">
     <div class="container">
-      <div class="brand">
-        <h3 class="title-container">Expense Tracker</h3>
-        <p>Record your Transaction here</p>
+      <div class="brand has-text-left py-2">
+        <h3 class="title is-3 has-text-left has-text-info has-text-weight-bold is-block">Expense Tracker</h3>
+        <p style="margin-top: -25px;">Record your transaction here</p>
       </div>
+
       <form id="transaction-form">
-        <!-- Date Selection -->
-        <div class="section-container">
-          <label class="label-container" for="date-picker">Transaction Date:</label>
-          <input type="date" id="date-picker" class="input is-small">
-        </div>
-
-        <!-- Bank Selection -->
-        <div class="section-container">
-          <label class="label-container">Select Payment Card:</label>
-          <div class="button-container" id="bankSet">
-
+        <div class="field">
+          <label class="label has-text-info">Transaction Date:</label>
+          <div class="control">
+            <input type="date" name="date" id="date-picker" class="input is-small">
           </div>
         </div>
 
-        <!-- Category Selection -->
-        <div class="section-container">
-          <label class="label-container">Choose Expense Category:</label>
-          <div class="button-container" id="categorySet">
-
+        <div class="field">
+          <label class="label has-text-info">Select Payment Card:</label>
+          <div class="buttons is-flex is-flex-wrap-wrap is-justify-content-start" id="bankSet">
+            <!-- Buttons here -->
+            <input type="hidden" id="selectedBankBtn" name="selectedBankBtn">
           </div>
         </div>
 
-        <!-- Enter Item Field -->
-        <div class="section-container">
-          <label class="label-container" for="item-input">Enter Item:</label>
-          <div class="label-container"></div>
-          <input type="text" id="item-input" class="input is-small" placeholder="Enter item name">
+        <div class="field">
+          <label class="label has-text-info">Enter Item:</label>
+          <div class="control">
+            <input type="text" id="item-input" name="item-name" class="input is-small" placeholder="Enter item name">
+          </div>
         </div>
 
-        <!-- Enter Amount Field -->
-        <div class="section-container">
-          <label class="label-container" for="amount-input">Enter Amount:</label>
-          <div class="label-container"></div> <input type="number" id="amount-input" class="input is-small"
-            placeholder="Enter amount">
+        <div class="field">
+          <label class="label has-text-info">Choose Expense Category:</label>
+          <div class="buttons" id="categorySet">
+            <input type="hidden" id="selectedCategoryBtn" name="selectedCategoryBtn">
+          </div>
         </div>
 
-        <!-- Form Buttons -->
-        <div class="form-buttons">
-          <button type="button" id="submitBtn" class="button is-success" onclick="submitForm(event)">Submit</button>
-          <button type="button" id="resetBttn" class="button is-danger" onclick="resetForm()">Reset</button>
+        <div class="field">
+          <label class="label has-text-info">Enter Amount:</label>
+          <div class="control">
+            <input type="number" id="amount-input" name="amount" class="input is-small" placeholder="Enter amount">
+          </div>
         </div>
-        <!-- Feedback Message -->
-        <p id="feedback-message"
-          style="display: none; color: green; font-weight: bold; text-align: center; margin-top: 10px;font-size:12px">
-        </p>
+
+        <div class="columns is-mobile">
+          <div class="column is-half-mobile buttons">
+            <button type="button" id="submitBtn" class="button is-success is-fullwidth"
+              onclick="submitForm(event)">Submit</button>
+
+          </div>
+          <div class="column is-half-mobile buttons">
+            <button type="button" id="resetBtn" class="button is-warning is-fullwidth"
+              onclick="resetForm()">Reset</button>
+          </div>
+        </div>
+        <p id="feedback-message" class="has-text-centered is-size-7 is-left" style="display: none;"></p>
       </form>
     </div>
   </section>
+
+
   <section id="setting" class="section">
     <h2 class="title">Setting</h2>
     <div id="googleLogin"></div>

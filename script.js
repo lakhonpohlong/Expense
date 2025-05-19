@@ -746,34 +746,29 @@ function resetForm() {
 async function submitForm(event) {
     event.preventDefault(); // Prevents default form submission
 
+    // Get form data
+    const transactionForm = document.getElementById("transaction-form");
+    // Get form values
     const date = document.getElementById("date-picker").value;
-    let item = document.getElementById("item-input").value;
-    let amount = document.getElementById("amount-input").value;
-    const selectedBank = selectedButtons.bank ? selectedButtons.bank.innerText : "None";
-    const selectedCategory = selectedButtons.category ? selectedButtons.category.innerText : "None";
+    const item = document.getElementById("item-input").value;
+    const amount = document.getElementById("amount-input").value;
+    const selectedBankBtn = document.getElementById("selectedBankBtn").value;
+    const selectedCategoryBtn = document.getElementById("selectedCategoryBtn").value;
 
-
-    if (!item || !amount) {
+    // Check if any field is empty
+    if (!date || !item || !amount || !selectedBankBtn || !selectedCategoryBtn) {
         feedbackMessage(
             "red",
             "Please fill out all fields before submitting.",
         )
         return;
     }
+    const formData = new FormData(transactionForm);
     disabledSubmitBtn(true)
-    let data = {
-        date,
-        bankName: selectedBank,
-        item,
-        category: selectedCategory,
-        amount
-    };
-
-
     await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: "add", module: "Transaction", data })
+        body: JSON.stringify({ action: "add", module: "Transaction", data: formData })
     })
         .then(response => response.text())
         .then(message => {
@@ -863,8 +858,12 @@ async function fetchButtons(module, field, set, withIcon) {
         const container = document.getElementById(`${set}Set`);
         buttonNames.forEach(name => {
             let button = document.createElement("button");
-            button.classList.add("button", "btn-outline", "is-small", "is-outlined")
+            button.classList.add("button", "is-info", "is-small", "is-outlined", "has-text-weight-bold"); // Apply Bulma classes
+            button.style.width = "30%"; // Apply inline style for width
+            button.style.maxWidth = "150px"; // Apply max-width
+            button.style.border = "1px solid #ADD8E6"; // Apply border color
             button.type = "button"
+            button.name = name
             if (withIcon) {
                 let icon = getCategoryDetails(name)
                 let i = document.createElement("i");
@@ -881,6 +880,9 @@ async function fetchButtons(module, field, set, withIcon) {
 
                 buttons.forEach(btn => btn.classList.remove('button-active', 'is-link'));
                 button.classList.add('button-active', 'is-link');
+                console.log(this.textContent);
+                document.getElementById("selectedBankBtn").value = this.textContent; // Store button text
+                document.getElementById("selectedCategoryBtn").value = this.textContent; // Store button text
 
                 selectedButtons[set] = button;
             }
