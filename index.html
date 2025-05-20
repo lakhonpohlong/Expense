@@ -364,6 +364,23 @@
       border: 2px solid #002050;
       box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
     }
+
+    .form-buttons {
+      position: relative;
+    }
+
+    .feedback-message {
+      position: absolute;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      bottom: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .buttons-set i {
+      padding-right: 0.3rem;
+    }
   </style>
 </head>
 
@@ -507,7 +524,7 @@
           </div>
         </div>
 
-        <div class="columns is-mobile">
+        <div class="columns is-mobile form-buttons">
           <div class="column is-half-mobile buttons">
             <button type="button" id="submitBtn" class="button is-success is-fullwidth"
               onclick="submitForm(event)">Submit</button>
@@ -517,8 +534,9 @@
             <button type="button" id="resetBtn" class="button is-warning is-fullwidth"
               onclick="resetForm()">Reset</button>
           </div>
+          <p id="feedback-message" class="feedback-message" style="display: none;"></p>
         </div>
-        <p id="feedback-message" class="has-text-centered is-size-7 is-left" style="display: none;"></p>
+
       </form>
     </div>
   </section>

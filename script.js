@@ -737,9 +737,10 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function resetForm() {
+
     document.getElementById("transaction-form").reset(); // Reset form
 
-    document.querySelectorAll(".btn-outline").forEach(btn => btn.classList.remove("button-active"));
+    document.querySelectorAll(".buttons-set").forEach(btn => btn.classList.remove("button-active"));
     document.getElementById("date-picker").valueAsDate = new Date(); // Restore prefilled value
 }
 
@@ -858,7 +859,7 @@ async function fetchButtons(module, field, set, withIcon) {
         const container = document.getElementById(`${set}Set`);
         buttonNames.forEach(name => {
             let button = document.createElement("button");
-            button.classList.add("button", "is-info", "is-small", "is-outlined", "has-text-weight-bold"); // Apply Bulma classes
+            button.classList.add("button", "buttons-set", "is-info", "is-small", "is-outlined", "has-text-weight-bold"); // Apply Bulma classes
             button.style.width = "30%"; // Apply inline style for width
             button.style.maxWidth = "150px"; // Apply max-width
             button.style.border = "1px solid #ADD8E6"; // Apply border color
