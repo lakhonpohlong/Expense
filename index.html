@@ -38,6 +38,7 @@
 
     body {
       padding-top: 60px;
+      /* background-color: #ecf8f8; */
 
     }
 
@@ -373,13 +374,55 @@
       position: absolute;
       font-size: 0.8rem;
       white-space: nowrap;
-      bottom: 5px;
+      bottom: -30px;
       left: 50%;
       transform: translateX(-50%);
     }
 
     .buttons-set i {
       padding-right: 0.3rem;
+    }
+
+    body {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .tabs ul {
+      border-bottom: 1px solid #ddd;
+    }
+
+    .tabs ul li a {
+      padding: 6px 8px;
+      font-size: 12px;
+    }
+
+    .tabs ul li.is-active a {
+      background-color: #209cee;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .buttons button {
+      font-size: 12px;
+      padding: 6px 10px;
+      min-height: 32px;
+    }
+
+    .input {
+      font-size: 12px;
+      padding: 6px;
+      height: 30px;
+    }
+
+    .submit-button {
+      font-size: 14px;
+      padding: 8px 12px;
+    }
+
+    .reset-button {
+      font-size: 14px;
+      padding: 8px 12px;
     }
   </style>
 </head>
@@ -482,62 +525,75 @@
   </section>
   <section id="addTransaction" class="section">
     <div class="container">
-      <div class="brand has-text-left py-2">
-        <h3 class="title is-3 has-text-left has-text-info has-text-weight-bold is-block">Expense Tracker</h3>
-        <p style="margin-top: -25px;">Record your transaction here</p>
-      </div>
-
+      <h1 class="title has-text-centered" style="font-size: 18px;">Expense Tracker Form</h1>
       <form id="transaction-form">
+        <!-- Hidden Inputs for Selected Values -->
+        <input type="hidden" id="selectedCategory" name="selectedCategory" />
+        <input type="hidden" id="selectedSubcategory" name="selectedSubcategory" />
+        <input type="hidden" id="selectedPaymentSource" name="selectedPaymentSource" />
+
+        <!-- Expense Date Field -->
         <div class="field">
-          <label class="label has-text-info">Transaction Date:</label>
+          <label class="label" style="font-size: 13px;">Expense Date</label>
           <div class="control">
-            <input type="date" name="date" id="date-picker" class="input is-small">
+            <input type="date" class="input" id="expenseDate" name="expenseDate" required />
           </div>
         </div>
 
+        <!-- Category Tabs -->
         <div class="field">
-          <label class="label has-text-info">Select Payment Card:</label>
-          <div class="buttons is-flex is-flex-wrap-wrap is-justify-content-start" id="bankSet">
-            <!-- Buttons here -->
-            <input type="hidden" id="selectedBankBtn" name="selectedBankBtn">
+          <label class="label" style="font-size: 13px;">Select a Category:</label>
+          <div class="tabs is-toggle">
+            <ul id="categoryTabs">
+              <li data-category="Groceries"><a>🛒 Groceries</a></li>
+              <li data-category="Child Care"><a>👶 Child Care</a></li>
+              <li data-category="Utilities"><a>🔌 Utilities</a></li>
+              <li data-category="Transportation"><a>🚗 Transport</a></li>
+              <li data-category="Healthcare"><a>⚕️ Healthcare</a></li>
+              <li data-category="Personal Care"><a>💇‍♂️ Personal Care</a></li>
+              <li data-category="Food & Dining"><a> Food & Dining</a></li>
+              <li data-category="Investments"><a>💰 Investments</a></li>
+              <li data-category="Entertainment"><a>🎭 Entertainment</a></li>
+              <li data-category="Debt Payments"><a>💳 Debt</a></li>
+              <li data-category="Housing"><a>🏠 Housing</a></li>
+              <li data-category="Household Essentials"><a>🏠 Household Essentials</a></li>
+              <li data-category="Shopping"><a>🏠 Shopping</a></li>
+              <li data-category="Miscellaneous"><a>🎁 Miscellaneous</a></li>
+            </ul>
           </div>
         </div>
 
+        <!-- Subcategory Buttons -->
+        <div id="subcategoryContainer" class="field"></div>
+
+        <!-- Payment Source Buttons -->
+        <div id="paymentSourceContainer" class="field"></div>
+
+        <!-- Amount & Description Inputs -->
         <div class="field">
-          <label class="label has-text-info">Enter Item:</label>
+          <label class="label" style="font-size: 13px;">Amount (₹)</label>
           <div class="control">
-            <input type="text" id="item-input" name="item-name" class="input is-small" placeholder="Enter item name">
+            <input type="number" class="input" id="amountInput" name="amount" required />
           </div>
         </div>
-
         <div class="field">
-          <label class="label has-text-info">Choose Expense Category:</label>
-          <div class="buttons" id="categorySet">
-            <input type="hidden" id="selectedCategoryBtn" name="selectedCategoryBtn">
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="label has-text-info">Enter Amount:</label>
+          <label class="label" style="font-size: 13px;">Description</label>
           <div class="control">
-            <input type="number" id="amount-input" name="amount" class="input is-small" placeholder="Enter amount">
+            <input type="text" class="input" id="descriptionInput" name="description" />
           </div>
         </div>
 
-        <div class="columns is-mobile form-buttons">
-          <div class="column is-half-mobile buttons">
-            <button type="button" id="submitBtn" class="button is-success is-fullwidth"
-              onclick="submitForm(event)">Submit</button>
-
+        <!-- Submit and Reset Buttons -->
+        <div class="field is-fullwidth">
+          <div class="control is-flex" style="gap: 10px; padding-top: 20px;">
+            <button type="submit" id="submitBtn" class="button submit-button is-info" style="flex: 1;">Submit
+              Expense</button>
+            <button type="reset" class="button reset-button is-warning" style="flex: 1;">Reset Form</button>
           </div>
-          <div class="column is-half-mobile buttons">
-            <button type="button" id="resetBtn" class="button is-warning is-fullwidth"
-              onclick="resetForm()">Reset</button>
-          </div>
-          <p id="feedback-message" class="feedback-message" style="display: none;"></p>
         </div>
 
       </form>
+      <p id="feedback-message" class="feedback-message" style="display: none;"></p>
     </div>
   </section>
 

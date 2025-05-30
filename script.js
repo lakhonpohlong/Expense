@@ -7,7 +7,26 @@ let filterTransactionData = [];
 let isEditing = false; // Flag to check if we are editing
 let editingRowNumber = null; // Row number to edit
 
-let cardList = [], categoryList = [];
+let cardList = [], subCategoryList = {}, headerList = {};
+
+document.addEventListener("DOMContentLoaded", function () {
+    //document.getElementById("date-picker").value = new Date().toISOString().split("T")[0];
+
+
+    fetchCategories()
+    getColumnData("Credit Card", 1).then(result => {
+
+        cardList = result
+        updateButtons(cardList, "paymentSourceContainer", "selectedPaymentSource", "Payment Source");
+
+
+    }).catch(error => console.error("Unexpected error:", error));
+    // Auto-fill today's date
+    const today = new Date().toISOString().split("T")[0]; // Format as YYYY-MM-DD
+    document.getElementById("expenseDate").value = today;
+    // initGoogleLogin();
+    localStorage.removeItem("selectedFilters");
+});
 async function fetchData() {
     try {
         const response = await fetch(`${apiUrl}?action=getTransaction`); // Replace with your Web App URL
@@ -511,46 +530,6 @@ function formattedDate() {
     return formattedDate;
 }
 
-
-// Fetch Card Numbers for Transaction Form
-function saveTransactionData(module) {
-    if (item.value === "" || amount.value === "") {
-        return false;
-    }
-    const data = {
-        date: formattedDate(),
-        card: selectedItems.firstSet,
-        item: item.value,
-        category: selectedItems.secondSet,
-        amount: amount.value
-    };
-    try {
-        fetch(apiUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "text/plain;charset=utf-8",
-            },
-            // Send the action in the request body.
-            body: JSON.stringify({ action: "add", module: 'Transaction', data })
-
-        });
-        alert('Transaction data saved successfully..!')
-        loadTableData(module, `${module.toLowerCase().replace(" ", "-")}-table`);
-        loadDashboardData(`${module.toLowerCase().replace(" ", "-")}-table`)
-
-        goTofirstPage()
-        // then(function (response) {
-        //     if (!response.ok) {
-        //         throw new Error("Network response was not ok");
-        //     }
-
-        // })
-        //     .catch(error => console.error("Error fetching card numbers:", error))
-    } catch (error) {
-        alert('Error Adding transaction:', error)
-    }
-}
-
 async function getButtonsData() {
     var firstSetData = {}
     try {
@@ -569,17 +548,11 @@ loadTableData("Profile", "profile-table");
 // loadTableData("Credit Cards", "credit-cards-table");
 window.onload = fetchData;
 
+// // google login
+// document.addEventListener("DOMContentLoaded", () => {
 
-// google login
-document.addEventListener("DOMContentLoaded", () => {
-    localStorage.removeItem("selectedFilters");
-    setTimeout(() => {
-        initGoogleLogin();
-        loadEmailFromCookie();
-    }, 1000);
-    // initGoogleLogin();
 
-});
+// });
 
 function handleCredentialResponse(response) {
     if (!response.credential) {
@@ -732,59 +705,33 @@ async function deleteSessionToken(email) {
 // ADD TRANSACTION START
 let selectedButtons = { bank: null, category: null };
 
-document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("date-picker").value = new Date().toISOString().split("T")[0];
-});
+
 
 function resetForm() {
 
     document.getElementById("transaction-form").reset(); // Reset form
 
-    document.querySelectorAll(".buttons-set").forEach(btn => btn.classList.remove("button-active"));
-    document.getElementById("date-picker").valueAsDate = new Date(); // Restore prefilled value
+    setTimeout(() => {
+        // Clear hidden fields
+        document.getElementById("expenseDate").valueAsDate = new Date(); // Restore prefilled value
+        document.getElementById("selectedCategory").value = "";
+        document.getElementById("selectedSubcategory").value = "";
+        document.getElementById("selectedPaymentSource").value = "";
+        document.querySelector(`#paymentSourceContainer .buttons`).querySelectorAll("button").forEach(btn => {
+            btn.classList.remove("is-link"); // Remove active class
+        });
+        // Clear subcategory/payment source containers
+        document.getElementById("subcategoryContainer").innerHTML = "";
+        // Optionally reinitialize to a default category (e.g., "Groceries")
+        const defaultCategory = "Groceries";
+        const defaultTab = document.querySelector(`#categoryTabs li[data-category="${defaultCategory}"]`);
+        if (defaultTab) {
+            activateTab(defaultTab, defaultCategory);
+        }
+    }, 0);
 }
 
-async function submitForm(event) {
-    event.preventDefault(); // Prevents default form submission
 
-    // Get form data
-    const transactionForm = document.getElementById("transaction-form");
-    // Get form values
-    const date = document.getElementById("date-picker").value;
-    const item = document.getElementById("item-input").value;
-    const amount = document.getElementById("amount-input").value;
-    const selectedBankBtn = document.getElementById("selectedBankBtn").value;
-    const selectedCategoryBtn = document.getElementById("selectedCategoryBtn").value;
-
-    // Check if any field is empty
-    if (!date || !item || !amount || !selectedBankBtn || !selectedCategoryBtn) {
-        feedbackMessage(
-            "red",
-            "Please fill out all fields before submitting.",
-        )
-        return;
-    }
-    const formData = new FormData(transactionForm);
-    disabledSubmitBtn(true)
-    await fetch(apiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: "add", module: "Transaction", data: formData })
-    })
-        .then(response => response.text())
-        .then(message => {
-            feedbackMessage('green', message)
-            disabledSubmitBtn(false)
-            resetForm();
-        })
-        .catch(error => {
-            disabledSubmitBtn(false)
-            console.error("Error:", error);
-
-        }).finally(() => {
-            disabledSubmitBtn(false)
-        })
-}
 function feedbackMessage(color, message) {
     let messageElement = document.getElementById("feedback-message");
     messageElement.style.display = "block";
@@ -840,67 +787,33 @@ async function getColumnData(module, field) {
         return { message: "Failed to fetch data" }
     }
 }
-getColumnData("Credit Card", 1).then(result => {
-
-    cardList = result
-
-}).catch(error => console.error("Unexpected error:", error));
 
 getColumnData("helper", 1).then(result => {
 
     categoryList = result
 }).catch(error => console.error("Unexpected error:", error));
 
+function fetchCategories() {
+    console.log("fetchCategories...");
 
-async function fetchButtons(module, field, set, withIcon) {
-    try {
-        let response = await fetch(`${apiUrl}?action=get&module=${encodeURIComponent(module)}&field=${field}`);
-        let buttonNames = await response.json();
-        const container = document.getElementById(`${set}Set`);
-        buttonNames.forEach(name => {
-            let button = document.createElement("button");
-            button.classList.add("button", "buttons-set", "is-info", "is-small", "is-outlined", "has-text-weight-bold"); // Apply Bulma classes
-            button.style.width = "30%"; // Apply inline style for width
-            button.style.maxWidth = "150px"; // Apply max-width
-            button.style.border = "1px solid #ADD8E6"; // Apply border color
-            button.type = "button"
-            button.name = name
-            if (withIcon) {
-                let icon = getCategoryDetails(name)
-                let i = document.createElement("i");
-                i.classList.add("fas", icon.icon)
-                button.appendChild(i)
+    // AJAX submission using plaintext with UTF-8 charset
+    fetch(`${apiUrl}?action=getCategories`, {
+        method: "GET",
+        headers: { "Content-Type": "text/plain; charset=UTF-8" },
+    })
+        .then(response => response.json())
+        .then(data => {
+            headerList = data.headers;
+            subCategoryList = data.data
 
-            }
-            let buttonText = document.createElement("span")
-            buttonText.innerText = name;
-            button.appendChild(buttonText)
-            button.onclick = function () {
-                const set = this.dataset.set;
-                const buttons = document.querySelectorAll(`button[data-set="${set}"]`);
+            // Only activate tab after data is fetched
+            const defaultCategory = "Groceries";
+            const defaultTab = document.querySelector(`#categoryTabs li[data-category="${defaultCategory}"]`);
+            if (defaultTab) activateTab(defaultTab, defaultCategory);
+        })
+        .catch(error => alert("Error Fetching categories: " + error));
 
-                buttons.forEach(btn => btn.classList.remove('button-active', 'is-link'));
-                button.classList.add('button-active', 'is-link');
-                console.log(this.textContent);
-                document.getElementById("selectedBankBtn").value = this.textContent; // Store button text
-                document.getElementById("selectedCategoryBtn").value = this.textContent; // Store button text
-
-                selectedButtons[set] = button;
-            }
-            button.setAttribute("data-set", set);
-            container.appendChild(button);
-
-        });
-    } catch (error) {
-        console.error("Error fetching data:", error);
-        return []; // Return an empty array in case of failure
-    }
 }
-fetchButtons("Credit Card", 1, "bank", false)
-
-
-fetchButtons("helper", 1, "category", true)
-
 
 function disabledSubmitBtn(disabled) {
     let submitButton = document.getElementById("submitBtn");
@@ -971,11 +884,6 @@ function renderTransactions(isFilter, page) {
     renderPagination(page); // Render pagination controls
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-
-    // renderTransactions(transactions)
-})
-
 // // Apply button: add any filtering logic as required and then close the modal
 // const applyFilterBtn = document.getElementById('applyFilterBtn');
 // applyFilterBtn.addEventListener('click', () => {
@@ -1004,6 +912,29 @@ function createInputData(list, elementId) {
         container.appendChild(elementFilter);
     });
 }
+
+function createCategories(items, containerId, inputId, labelText) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = `<label class="label" style="font-size: 13px;">Select ${labelText}:</label><div class="buttons"></div>`;
+    const buttonGroup = container.querySelector(".buttons");
+
+    items.forEach(item => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "button";
+        button.textContent = item;
+        button.addEventListener("click", () => {
+            // Remove active class from all buttons in this group
+            buttonGroup.querySelectorAll("button").forEach(btn => btn.classList.remove("is-link"));
+            // Mark the selected button
+            button.classList.add("is-link");
+            // Set the hidden field with the selected value
+            document.getElementById(inputId).value = item;
+        });
+        buttonGroup.appendChild(button);
+    });
+}
+
 
 // SEARCH N FILTER
 // Function to filter transactions by keyword across multiple fields
@@ -1191,3 +1122,101 @@ function clearAll() {
     updateDynamicButtons();
     searchTransactionB();
 }
+
+// Listen for clicks on category tabs
+document.getElementById("categoryTabs").addEventListener("click", event => {
+    const li = event.target.closest("li");
+    if (li) {
+        activateTab(li, li.dataset.category);
+    }
+});
+
+// Activate a category tab and update subcategory and payment source buttons
+function activateTab(tab, category) {
+    // Highlight active category tab
+    document.querySelectorAll("#categoryTabs li").forEach(item => item.classList.remove("is-active"));
+    tab.classList.add("is-active");
+    // Set selected category value
+    document.getElementById("selectedCategory").value = category;
+
+    // Reset hidden fields for subcategory and payment source
+    document.getElementById("selectedSubcategory").value = "";
+    document.getElementById("selectedPaymentSource").value = "";
+
+    // Update subcategory and payment source buttons accordingly
+    updateButtons(subCategoryList[category], "subcategoryContainer", "selectedSubcategory", "Subcategory");
+}
+
+// Dynamically create buttons for selection (subcategories or payment sources)
+function updateButtons(items, containerId, inputId, labelText) {
+
+    const container = document.getElementById(containerId);
+    container.innerHTML = `<label class="label" style="font-size: 13px;">Select ${labelText}:</label><div class="buttons"></div>`;
+    const buttonGroup = container.querySelector(".buttons");
+
+    items.forEach(item => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "button";
+        button.textContent = item;
+        button.addEventListener("click", () => {
+            // Remove active class from all buttons in this group
+            buttonGroup.querySelectorAll("button").forEach(btn => btn.classList.remove("is-link"));
+            // Mark the selected button
+            button.classList.add("is-link");
+            // Set the hidden field with the selected value
+            document.getElementById(inputId).value = item;
+        });
+        buttonGroup.appendChild(button);
+    });
+}
+
+// Form submission event with field validation
+document.getElementById("transaction-form").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    // Capture form data
+    const formData = {
+        date: document.getElementById("expenseDate").value,
+        category: document.getElementById("selectedCategory").value,
+        subcategory: document.getElementById("selectedSubcategory").value,
+        paymentSource: document.getElementById("selectedPaymentSource").value,
+        amount: document.getElementById("amountInput").value,
+        description: document.getElementById("descriptionInput").value
+    };
+
+    // Validation: Check required fields
+    if (!formData.date || !formData.category || !formData.subcategory || !formData.paymentSource || !formData.amount) {
+        feedbackMessage(
+            "red",
+            "Please fill out all fields before submitting.",
+        )
+        return;
+    }
+    disabledSubmitBtn(true);
+    // AJAX submission using plaintext with UTF-8 charset
+    fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain; charset=UTF-8" },
+        body: JSON.stringify({ action: "add", module: "Transaction", data: formData })
+    })
+        .then(response => response.text())
+        .then(message => {
+            feedbackMessage('green', message)
+            disabledSubmitBtn(false)
+            resetForm();
+        })
+        .catch(error => {
+            disabledSubmitBtn(false)
+            console.error("Error:", error);
+
+        }).finally(() => {
+            disabledSubmitBtn(false)
+        })
+});
+
+// Reset event listener: Clear all hidden inputs and reinitialize default category selection
+document.getElementById("transaction-form").addEventListener("reset", function (event) {
+    // Give the form time to reset before reinitializing the UI
+    resetForm()
+});
