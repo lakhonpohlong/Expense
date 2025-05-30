@@ -1202,6 +1202,7 @@ document.getElementById("transaction-form").addEventListener("submit", function 
     })
         .then(response => response.text())
         .then(message => {
+            fetchData()
             feedbackMessage('green', message)
             disabledSubmitBtn(false)
             resetForm();
