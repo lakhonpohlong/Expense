@@ -22,7 +22,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }).catch(error => console.error("Unexpected error:", error));
     // Auto-fill today's date
-    const today = new Date().toISOString().split("T")[0]; // Format as YYYY-MM-DD
+
+    const now = new Date();
+    now.setHours(now.getHours() + 5, now.getMinutes() + 30); // Convert UTC to IST
+    const today = now.toISOString().split("T")[0]; // Format as YYYY-MM-DD
     document.getElementById("expenseDate").value = today;
     // initGoogleLogin();
     localStorage.removeItem("selectedFilters");
@@ -794,7 +797,6 @@ getColumnData("helper", 1).then(result => {
 }).catch(error => console.error("Unexpected error:", error));
 
 function fetchCategories() {
-    console.log("fetchCategories...");
 
     // AJAX submission using plaintext with UTF-8 charset
     fetch(`${apiUrl}?action=getCategories`, {
@@ -811,7 +813,7 @@ function fetchCategories() {
             const defaultTab = document.querySelector(`#categoryTabs li[data-category="${defaultCategory}"]`);
             if (defaultTab) activateTab(defaultTab, defaultCategory);
         })
-        .catch(error => alert("Error Fetching categories: " + error));
+        .catch(error => console.log("Error Fetching categories: " + error));
 
 }
 
@@ -856,21 +858,20 @@ function renderTransactions(isFilter, page) {
         const card = document.createElement("div");
         card.classList.add("card", "is-flex");
         card.innerHTML = `
-        <div class="" style="width: 10%;">
-            <span class="icon ${category.color}">
-                <i class="fas ${category.icon}"></i>
-            </span>
-      </div>
-        <div class="is-flex is-flex-direction-column" style="width: 90%;">
-            <div class="is-flex is-justify-content-space-between">
-                <span class=" one-line  has-text-semi-bold">${capitalizeFirstLetter(transaction.item)}</span>
-                <span class="amount has-text-info">${formatAmountInINR(transaction.amount)}</span>
+        
+            <div class="left-cardData is-size-7" style="width: 20%;">
+            <p class="has-text-weight-bold">${formatDate(transaction.date)}</p>
             </div>
-            <div class="is-flex is-justify-content-space-between">
-                <span class="is-size-7">Paid on ${formatDate(transaction.date)}</span>
-                <span class="is-size-7">${transaction.card}</span>
+            <div class="right-cardData is-flex is-flex-direction-column" style="width: 80%;">
+                <div class="is-flex is-justify-content-space-between">
+                    <span class=" one-line  has-text-semi-bold">${capitalizeFirstLetter(transaction.item)}</span>
+                    <span class="amount is-size-6 has-text-info has-text-weight-bold">${formatAmountInINR(transaction.amount)}</span>
+                </div>
+                    <div class="is-flex is-justify-content-space-between">
+                    <span class="is-size-7">Paid on ${formatDate(transaction.date)}</span>
+                    <span class="is-size-7">${transaction.card}</span>
+                </div>
             </div>
-        </div>
     `;
 
         // Add click event listener to highlight selected card
