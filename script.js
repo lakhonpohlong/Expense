@@ -864,11 +864,11 @@ function renderTransactions(isFilter, page) {
             </div>
             <div class="right-cardData is-flex is-flex-direction-column" style="width: 80%;">
                 <div class="is-flex is-justify-content-space-between">
-                    <span class=" one-line  has-text-semi-bold">${capitalizeFirstLetter(transaction.item)}</span>
+                    <span class=" one-line  has-text-semi-bold">${capitalizeFirstLetter(transaction.subcategory)}</span>
                     <span class="amount is-size-6 has-text-info has-text-weight-bold">${formatAmountInINR(transaction.amount)}</span>
                 </div>
                     <div class="is-flex is-justify-content-space-between">
-                    <span class="is-size-7">Paid on ${formatDate(transaction.date)}</span>
+                    <span class="is-size-7"> ${transaction.category}</span>
                     <span class="is-size-7">${transaction.card}</span>
                 </div>
             </div>
