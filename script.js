@@ -808,6 +808,7 @@ function fetchCategories() {
             headerList = data.headers;
             subCategoryList = data.data
 
+            loadHeaderList(headerList)
             // Only activate tab after data is fetched
             const defaultCategory = "Groceries";
             const defaultTab = document.querySelector(`#categoryTabs li[data-category="${defaultCategory}"]`);
@@ -858,7 +859,6 @@ function renderTransactions(isFilter, page) {
         const card = document.createElement("div");
         card.classList.add("card", "is-flex");
         card.innerHTML = `
-        
             <div class="left-cardData is-size-7" style="width: 20%;">
             <p class="has-text-weight-bold">${formatDate(transaction.date)}</p>
             </div>
@@ -912,6 +912,21 @@ function createInputData(list, elementId) {
         `;
         container.appendChild(elementFilter);
     });
+}
+function loadHeaderList(lists) {
+    const ul = document.getElementById("categoryTabs");
+    ul.innerHTML = "";
+    lists.forEach(item => {
+        const li = document.createElement("li")
+        li.dataset.category = removeIcons(item)
+        li.innerHTML = `
+        <a>${item}</a>
+        `
+        ul.appendChild(li);
+    })
+}
+function removeIcons(text) {
+    return text.replace(/^[^\w\s]+/, "").trim(); // Removes leading non-alphanumeric characters
 }
 
 function createCategories(items, containerId, inputId, labelText) {

@@ -116,10 +116,10 @@
     /* Card Layout */
     .card {
       /* padding: 0.5rem 0.8rem; */
-      border: 1px solid rgba(0, 0, 0, 0.04);
       /* Light border */
       border-radius: 6px;
       /* Rounded corners */
+      border: 1px solid rgba(0, 0, 0, 0.04);
       box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
       /* Soft shadow */
       transition: background-color 0.3s ease-in-out;
@@ -130,6 +130,11 @@
     .left-cardData {
       background-color: #209cee;
       border-radius: 6px 0 0 6px;
+      /* Rounded corners */
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      /* Soft shadow */
+      transition: background-color 0.3s ease-in-out;
       color: white;
       display: flex;
       text-align: center;
@@ -561,22 +566,9 @@
         <!-- Category Tabs -->
         <div class="field">
           <label class="label" style="font-size: 13px;">Select a Category:</label>
-          <div class="tabs is-toggle">
+          <div class="tabs is-toggle" id="categoryList">
             <ul id="categoryTabs">
-              <li data-category="Groceries"><a>🛒 Groceries</a></li>
-              <li data-category="Child Care"><a>👶 Child Care</a></li>
-              <li data-category="Utilities"><a>🔌 Utilities</a></li>
-              <li data-category="Transportation"><a>🚗 Transport</a></li>
-              <li data-category="Healthcare"><a>⚕️ Healthcare</a></li>
-              <li data-category="Personal Care"><a>💇‍♂️ Personal Care</a></li>
-              <li data-category="Food & Dining"><a> Food & Dining</a></li>
-              <li data-category="Investments"><a>💰 Investments</a></li>
-              <li data-category="Entertainment"><a>🎭 Entertainment</a></li>
-              <li data-category="Debt Payments"><a>💳 Debt</a></li>
-              <li data-category="Housing"><a>🏠 Housing</a></li>
-              <li data-category="Household Essentials"><a>🏠 Household Essentials</a></li>
-              <li data-category="Shopping"><a>🏠 Shopping</a></li>
-              <li data-category="Miscellaneous"><a>🎁 Miscellaneous</a></li>
+              <!-- dynamic list here -->
             </ul>
           </div>
         </div>
