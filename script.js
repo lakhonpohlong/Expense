@@ -30,16 +30,32 @@ document.addEventListener("DOMContentLoaded", function () {
     // initGoogleLogin();
     localStorage.removeItem("selectedFilters");
 });
-async function fetchData() {
+
+async function fetchData(endpoint, params = {}) {
     try {
-        const response = await fetch(`${apiUrl}?action=getTransaction`); // Replace with your Web App URL
-        transactionData = await response.json();
-        filterTransactionData = transactionData;
-        renderTransactions(false, currentPage)
+        const url = new URL(`${apiUrl}?action=${endpoint}`);
+
+        // Append additional query parameters if provided
+        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        return data; // Return data for flexible reuse
+
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error(`Error fetching data from ${endpoint}:`, error);
+        return null; // Return null if there's an error
     }
 }
+
+// Fetch transaction data
+fetchData("getTransaction").then(data => {
+    transactionData = data;
+    filterTransactionData = transactionData;
+    renderTransactions(false, currentPage);
+});
+
 
 // Function to render pagination controls
 function renderPagination(activePage) {
@@ -1236,4 +1252,43 @@ document.getElementById("transaction-form").addEventListener("submit", function 
 document.getElementById("transaction-form").addEventListener("reset", function (event) {
     // Give the form time to reset before reinitializing the UI
     resetForm()
+});
+
+function loadTodayTransaction(lists) {
+    const container = document.getElementById("todayTransaction-content");
+    container.innerHTML = ""
+    if (lists.length > 0) {
+        lists.forEach((item) => {
+            container.innerHTML += `
+    <div class="column  is-full">
+        <div class="columns card-transaction">
+            <div class="column first-column">
+                <div class="rounded-div">${item.icon}</div>
+            </div>
+            <div class="column has-text-left second-column">
+                <p class="is-size-6 has-text-weight-bold">${item.subcategory}</p>
+                <p class="is-size-7">${item.category}</p>
+            </div>
+            <div class="column third-column">
+                <p class="has-text-info has-text-weight-bold">${formatAmountInINR(item.amount)}</p>
+                <p class="is-size-7">${item.card}</p>
+            </div>
+        </div>
+            
+    </div>   
+    `
+        })
+    } else {
+        container.innerHTML = `
+         <div class="column">
+        <p>No Transaction for Today!</p>
+        </div>
+        `
+    }
+}
+// Fetch today transaction data
+fetchData("getTodayTransaction").then(data => {
+    console.log(data);
+
+    loadTodayTransaction(data.data);
 });

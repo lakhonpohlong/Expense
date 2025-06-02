@@ -78,7 +78,7 @@
     }
 
     .titleHead {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       font-weight: bold;
       margin-bottom: 10px;
     }
@@ -447,6 +447,64 @@
       font-size: 14px;
       padding: 8px 12px;
     }
+
+    .rounded-div {
+      width: 2.5rem;
+      /* Adjust size */
+      height: 2.5rem;
+      background-color: rgba(239, 234, 234, 0.5);
+      /* Light background */
+      border-radius: 50%;
+      /* Makes it round */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
+      /* Soft shadow */
+      font-family: Arial, sans-serif;
+      color: #333;
+    }
+
+    .columns {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-transaction {
+      margin: 1px;
+      border-radius: 8px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    .first-column {
+      flex: 0 0 10%;
+      /* Set max width */
+      flex-shrink: 0;
+      text-align: left;
+      /* Prevents columns from resizing */
+    }
+
+    .second-column {
+      flex: 0 0 55%;
+      flex-direction: column;
+      /* Override Bulma's default */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .third-column {
+      flex: 0 0 25%;
+      text-align: right;
+    }
+
+    .right-align {
+      text-align: right;
+      /* Align text to the right */
+    }
   </style>
 </head>
 
@@ -469,6 +527,9 @@
   <section id="home" class="section active">
     <div class="titleHead">Credit Card Details</div>
     <div class="columns is-mobile is-multiline" id="dashboard-content">
+    </div>
+    <div class="titleHead">Expense(s) - Today</div>
+    <div class="columns is-mobile is-multiline" id="todayTransaction-content">
     </div>
   </section> <!-- start profile section -->
   <section id="profile" class="section">
