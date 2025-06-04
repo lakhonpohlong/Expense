@@ -1274,7 +1274,7 @@ document.getElementById("transaction-form").addEventListener("submit", function 
     fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "text/plain; charset=UTF-8" },
-        body: JSON.stringify({ action: "add", module: "Transaction", data: formData })
+        body: JSON.stringify({ action: "add", module: "unsortedTransaction", data: formData })
     })
         .then(response => response.text())
         .then(message => {
