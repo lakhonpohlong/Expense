@@ -7,7 +7,7 @@ let filterTransactionData = [];
 let isEditing = false; // Flag to check if we are editing
 let editingRowNumber = null; // Row number to edit
 
-let cardList = [], subCategoryList = {}, headerList = {};
+let cardList = [], subCategoryList = {}, headerList = {}, headerWOIcon = {};
 
 document.addEventListener("DOMContentLoaded", function () {
     //document.getElementById("date-picker").value = new Date().toISOString().split("T")[0];
@@ -148,7 +148,7 @@ async function loadDashboardData(tableId) {
         //console.log(editData);
         const cardDetails = document.querySelectorAll('.card-details');
         cardDetails.forEach((cardDetail, index) => {
-            cardDetail.style.backgroundColor = colorPalletes[index];
+            cardDetail.style.backgroundColor = getRandomLightColor()
         })
     } catch (error) {
         console.error("Error loading dashboard data:", error);
@@ -193,7 +193,7 @@ function handleModalWithCheckbox(modalId, action) {
         if (action === 'open') {
             // Load the checkboxes dynamically first
             createInputData(cardList, "panel-payment")
-            createInputData(categoryList, "panel-category")
+            createInputData(headerWOIcon, "panel-category")
 
             const savedFiltersRaw = localStorage.getItem("selectedFilters");
             if (savedFiltersRaw !== null) {
@@ -402,6 +402,17 @@ document.getElementById("saveCreditCardButton").addEventListener("click", (e) =>
 //   submitData("Transactions", "transaction-form");
 //   //modals.transaction.classList.remove("is-active");
 // });
+
+function getRandomLightColor() {
+    let hue = Math.floor(Math.random() * 360); // Full spectrum
+    let saturation = Math.floor(Math.random() * 50) + 40; // Random saturation between 40-90%
+    let lightness = Math.floor(Math.random() * 10) + 92; // Lightness between 90-100%
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+}
+
+document.querySelectorAll('.card-details').forEach(card => {
+    card.style.backgroundColor = getRandomLightColor();
+});
 
 function loadTableData(module, tableId) {
     fetch(`${apiUrl}?action=get&module=${module}`)
@@ -824,6 +835,7 @@ function fetchCategories() {
             headerList = data.headers;
             subCategoryList = data.data
 
+            headerWOIcon = headerList.map(item => item.includes(" ") ? item.substring(item.indexOf(" ") + 1) : item)
             loadHeaderList(headerList)
             // Only activate tab after data is fetched
             const defaultCategory = "Groceries";
@@ -1000,7 +1012,7 @@ document.querySelector(".clear-icon").addEventListener("click", function () {
 const filterTransactionsB = (selectedCards, selectedCategories, dateFrom, dateTo, transactions) => {
     return transactions.filter(txn => {
         let matchesCard = selectedCards.length ? selectedCards.includes(txn.card) : true;
-        let matchesCategory = selectedCategories.length ? selectedCategories.includes(txn.spendCategory) : true;
+        let matchesCategory = selectedCategories.length ? selectedCategories.includes(txn.category) : true;
         let matchesDate = (!dateFrom || !dateTo) ? true : (new Date(txn.date) >= new Date(dateFrom) && new Date(txn.date) <= new Date(dateTo));
         return matchesCard && matchesCategory && matchesDate;
     });
@@ -1207,13 +1219,19 @@ function updateButtons(items, containerId, inputId, labelText) {
 document.getElementById("transaction-form").addEventListener("submit", function (event) {
     event.preventDefault();
 
+    const category = document.getElementById("selectedCategory").value;
+    let amount = document.getElementById("amountInput").value;
+
+    if (category === "Debt Payments") {
+        amount = -amount;
+    }
     // Capture form data
     const formData = {
         date: document.getElementById("expenseDate").value,
         category: document.getElementById("selectedCategory").value,
         subcategory: document.getElementById("selectedSubcategory").value,
         paymentSource: document.getElementById("selectedPaymentSource").value,
-        amount: document.getElementById("amountInput").value,
+        amount: amount,
         description: document.getElementById("descriptionInput").value
     };
 
@@ -1255,10 +1273,21 @@ document.getElementById("transaction-form").addEventListener("reset", function (
 });
 
 function loadTodayTransaction(lists) {
+    let total = 0;
     const container = document.getElementById("todayTransaction-content");
+    const title_con = document.createElement("div")
+    title_con.classList.add("is-flex", "is-justify-content-space-between", "px-3", "py-0");
+    title_con.style.width = "100%"
+    title_con.innerHTML = `
+    <h3 class="titleHead">Today's Expenses</h3>
+    <p class="titleHead" id="total-expense">Rs1000</p>
+    `
+    container.classList.add("pt-4")
     container.innerHTML = ""
+    container.appendChild(title_con);
     if (lists.length > 0) {
         lists.forEach((item) => {
+            total += item.amount;
             container.innerHTML += `
     <div class="column  is-full">
         <div class="columns card-transaction">
@@ -1285,7 +1314,13 @@ function loadTodayTransaction(lists) {
         </div>
         `
     }
+    document.getElementById("total-expense").innerText = formatAmountInINR(total);
 }
+
+function removeUnicodeIcons(text) {
+    return text.replace(/[\p{Emoji}]/gu, ''); // Removes all emoji/unicode icons
+}
+
 // Fetch today transaction data
 fetchData("getTodayTransaction").then(data => {
     console.log(data);
