@@ -477,11 +477,12 @@ function fetchCardNumbers() {
         .catch(error => console.error("Error fetching card numbers:", error));
 }
 
-function formattedDate() {
-    const currentDate = new Date();
+
+function formattedDateDDMMYYYY(date) {
+    const currentDate = new Date(date);
     const day = String(currentDate.getDate()).padStart(2, '0'); // Ensures two digits
     const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Month starts from 0
-    const year = String(currentDate.getFullYear()).slice(-2); // Gets last two digits of the year
+    const year = String(currentDate.getFullYear()); // Gets last two digits of the year
 
     const formattedDate = `${day}-${month}-${year}`;
     //console.log(formattedDate); // Outputs something like "14-04-25"
@@ -510,6 +511,31 @@ function utilizedPercent(utilized, limit) {
     const utilizedPer = utilized / limit * 100;
     return Math.floor(utilizedPer);
 }
+function formatDateWithOrdinal(inputDate) {
+    let date = new Date(inputDate);
+    let day = date.getDate();
+    let monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    let month = monthNames[date.getMonth()];
+    let year = date.getFullYear();
+
+    // Determine the correct ordinal suffix
+    let ordinal;
+    if (day === 1 || day === 21 || day === 31) {
+        ordinal = "st";
+    } else if (day === 2 || day === 22) {
+        ordinal = "nd";
+    } else if (day === 3 || day === 23) {
+        ordinal = "rd";
+    } else {
+        ordinal = "th";
+    }
+
+    return `${day}${ordinal} ${month} ${year}`;
+}
+
+
 
 const secondSetData = [
     { item: "Recurring", icon: "fas fa-sync" },
@@ -888,7 +914,7 @@ function renderTransactions(isFilter, page) {
         card.classList.add("card", "is-flex");
         card.innerHTML = `
             <div class="left-cardData is-size-7" style="width: 20%;">
-            <p class="has-text-weight-bold">${formatDate(transaction.date)}</p>
+            <p class="has-text-weight-bold">${formatDateWithOrdinal(transaction.date)}</p>
             </div>
             <div class="right-cardData is-flex is-flex-direction-column" style="width: 80%;">
                 <div class="is-flex is-justify-content-space-between">
@@ -1227,7 +1253,7 @@ document.getElementById("transaction-form").addEventListener("submit", function 
     }
     // Capture form data
     const formData = {
-        date: document.getElementById("expenseDate").value,
+        date: formattedDateDDMMYYYY(document.getElementById("expenseDate").value),
         category: document.getElementById("selectedCategory").value,
         subcategory: document.getElementById("selectedSubcategory").value,
         paymentSource: document.getElementById("selectedPaymentSource").value,
@@ -1252,7 +1278,16 @@ document.getElementById("transaction-form").addEventListener("submit", function 
     })
         .then(response => response.text())
         .then(message => {
-            fetchData()
+            // Fetch transaction data
+            fetchData("getTransaction").then(data => {
+                transactionData = data;
+                filterTransactionData = transactionData;
+                renderTransactions(false, currentPage);
+            });
+            // Fetch today transaction data
+            fetchData("getTodayTransaction").then(data => {
+                loadTodayTransaction(data.data);
+            });
             feedbackMessage('green', message)
             disabledSubmitBtn(false)
             resetForm();
@@ -1280,7 +1315,7 @@ function loadTodayTransaction(lists) {
     title_con.style.width = "100%"
     title_con.innerHTML = `
     <h3 class="titleHead">Today's Expenses</h3>
-    <p class="titleHead" id="total-expense">Rs1000</p>
+    <p class="titleHead" id="total-expense"></p>
     `
     container.classList.add("pt-4")
     container.innerHTML = ""
@@ -1307,23 +1342,17 @@ function loadTodayTransaction(lists) {
     </div>   
     `
         })
+        document.getElementById("total-expense").innerText = formatAmountInINR(total);
     } else {
-        container.innerHTML = `
+        container.innerHTML += `
          <div class="column">
         <p>No Transaction for Today!</p>
         </div>
         `
     }
-    document.getElementById("total-expense").innerText = formatAmountInINR(total);
-}
-
-function removeUnicodeIcons(text) {
-    return text.replace(/[\p{Emoji}]/gu, ''); // Removes all emoji/unicode icons
 }
 
 // Fetch today transaction data
 fetchData("getTodayTransaction").then(data => {
-    console.log(data);
-
     loadTodayTransaction(data.data);
 });
