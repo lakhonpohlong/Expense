@@ -49,10 +49,11 @@ function formatDateIST(date) {
     let hours = String(istTime.getHours()).padStart(2, '0');
     let minutes = String(istTime.getMinutes()).padStart(2, '0');
 
-    // console.log("formatDateIST" + `${month} /${day}/${year}, ${hours}:${minutes}`);
+    const formatedDate = `${month}/${day}/${year}, ${hours}:${minutes}`
+    console.log("formatDateIST" + formatedDate);
 
     // Format as MM/dd/yyyy, hh:mm (24-hour format)
-    return `${month}/${day}/${year}, ${hours}:${minutes}`;
+    return formatedDate;
 }
 
 
@@ -1301,7 +1302,7 @@ document.getElementById("transaction-form").addEventListener("submit", function 
     fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "text/plain; charset=UTF-8" },
-        body: JSON.stringify({ action: "add", module: "unsortedTransaction", data: formData })
+        body: JSON.stringify({ action: "add", module: "Transaction", data: formData })
     })
         .then(response => response.text())
         .then(message => {
