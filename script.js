@@ -23,13 +23,23 @@ document.addEventListener("DOMContentLoaded", function () {
     }).catch(error => console.error("Unexpected error:", error));
     // Auto-fill today's date
 
-    const now = new Date();
-    now.setHours(now.getHours() + 5, now.getMinutes() + 30); // Convert UTC to IST
-    const today = now.toISOString().split("T")[0]; // Format as YYYY-MM-DD
-    document.getElementById("expenseDate").value = today;
-    // initGoogleLogin();
+    // Usage
+    document.getElementById("expenseDate").value = getFormattedISTDate();
     localStorage.removeItem("selectedFilters");
 });
+function getFormattedISTDate() {
+    let now = new Date();
+
+    // Convert to IST (UTC +5:30)
+    let istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC +5:30
+    let istTime = new Date(now.getTime() + istOffset);
+
+    // Format to YYYY-MM-DDTHH:MM (needed for datetime-local input)
+    let formattedDate = istTime.toISOString().slice(0, 16);
+
+    return formattedDate;
+}
+
 
 async function fetchData(endpoint, params = {}) {
     try {
@@ -484,7 +494,7 @@ function formattedDateDDMMYYYY(date) {
     const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Month starts from 0
     const year = String(currentDate.getFullYear()); // Gets last two digits of the year
 
-    const formattedDate = `${day}-${month}-${year}`;
+    const formattedDate = `${month}/${day}/${year}`;
     //console.log(formattedDate); // Outputs something like "14-04-25"
     return formattedDate;
 }
