@@ -39,6 +39,23 @@ function getFormattedISTDate() {
 
     return formattedDate;
 }
+function formatDateIST(date) {
+
+    let istTime = new Date(date);
+    // Extract components
+    let month = String(istTime.getMonth() + 1).padStart(2, '0');
+    let day = String(istTime.getDate()).padStart(2, '0');
+    let year = istTime.getFullYear();
+    let hours = String(istTime.getHours()).padStart(2, '0');
+    let minutes = String(istTime.getMinutes()).padStart(2, '0');
+
+    // console.log("formatDateIST" + `${month} /${day}/${year}, ${hours}:${minutes}`);
+
+    // Format as MM/dd/yyyy, hh:mm (24-hour format)
+    return `${month}/${day}/${year}, ${hours}:${minutes}`;
+}
+
+
 
 
 async function fetchData(endpoint, params = {}) {
@@ -513,7 +530,7 @@ function formatDateToDDMMYY(isoTimestamp) {
 
     return `${day}-${month}-${year}`;
 }
-function formatDate(isoTimeStamp) {
+function dformatDate(isoTimeStamp) {
     const date = new Date(isoTimeStamp);
     return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 }
@@ -779,7 +796,7 @@ function resetForm() {
 
     setTimeout(() => {
         // Clear hidden fields
-        document.getElementById("expenseDate").valueAsDate = new Date(); // Restore prefilled value
+        document.getElementById("expenseDate").value = getFormattedISTDate(); // Restore prefilled value
         document.getElementById("selectedCategory").value = "";
         document.getElementById("selectedSubcategory").value = "";
         document.getElementById("selectedPaymentSource").value = "";
@@ -1263,7 +1280,7 @@ document.getElementById("transaction-form").addEventListener("submit", function 
     }
     // Capture form data
     const formData = {
-        date: formattedDateDDMMYYYY(document.getElementById("expenseDate").value),
+        date: formatDateIST(document.getElementById("expenseDate").value),
         category: document.getElementById("selectedCategory").value,
         subcategory: document.getElementById("selectedSubcategory").value,
         paymentSource: document.getElementById("selectedPaymentSource").value,
