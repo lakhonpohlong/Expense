@@ -1002,7 +1002,6 @@ function removeIcons(text) {
 function loadHeaderList(lists) {
     const ul = document.getElementById("categoryTabs");
     ul.innerHTML = "";
-
     const categories = Object.keys(lists).slice(1);
     categories.forEach(category => {
         const iconClass = getCategoryIconClass(category); // Get matching Font Awesome icon
@@ -1262,10 +1261,10 @@ function activateTab(tab, category) {
     // Highlight active category tab
     document.querySelectorAll("#categoryTabs li").forEach(item => {
         item.classList.remove("is-active")
-        item.classList.remove("has-text-info");
+        item.querySelector("a i")?.classList.add("has-text-info");
     });
-
     tab.classList.add("is-active");
+    tab.querySelector("a i")?.classList.remove("has-text-info");
     // Set selected category value
     document.getElementById("selectedCategory").value = category;
 
