@@ -221,7 +221,7 @@ function handleModalWithCheckbox(modalId, action) {
         if (action === 'open') {
             // Load the checkboxes dynamically first
             createInputData(cardList, "panel-payment")
-            createInputData(headerWOIcon, "panel-category")
+            createInputData(subCategoryList, "panel-category")
 
             const savedFiltersRaw = localStorage.getItem("selectedFilters");
             if (savedFiltersRaw !== null) {
@@ -880,17 +880,18 @@ getColumnData("helper", 1).then(result => {
 function fetchCategories() {
 
     // AJAX submission using plaintext with UTF-8 charset
-    fetch(`${apiUrl}?action=getCategories`, {
+    fetch(`${apiUrl}?action=getCategories2`, {
         method: "GET",
         headers: { "Content-Type": "text/plain; charset=UTF-8" },
     })
         .then(response => response.json())
         .then(data => {
-            headerList = data.headers;
-            subCategoryList = data.data
+            // headerList = data.headers;
+            subCategoryList = data
+            console.log(subCategoryList["Groceries"]);
 
-            headerWOIcon = headerList.map(item => item.includes(" ") ? item.substring(item.indexOf(" ") + 1) : item)
-            loadHeaderList(headerList)
+            // headerWOIcon = headerList.map(item => item.includes(" ") ? item.substring(item.indexOf(" ") + 1) : item)
+            loadHeaderList(subCategoryList)
             // Only activate tab after data is fetched
             const defaultCategory = "Groceries";
             const defaultTab = document.querySelector(`#categoryTabs li[data-category="${defaultCategory}"]`);
@@ -995,21 +996,48 @@ function createInputData(list, elementId) {
         container.appendChild(elementFilter);
     });
 }
-function loadHeaderList(lists) {
-    const ul = document.getElementById("categoryTabs");
-    ul.innerHTML = "";
-    lists.forEach(item => {
-        const li = document.createElement("li")
-        li.dataset.category = removeIcons(item)
-        li.innerHTML = `
-        <a>${item}</a>
-        `
-        ul.appendChild(li);
-    })
-}
 function removeIcons(text) {
     return text.replace(/^[^\w\s]+/, "").trim(); // Removes leading non-alphanumeric characters
 }
+function loadHeaderList(lists) {
+    const ul = document.getElementById("categoryTabs");
+    ul.innerHTML = "";
+
+    const categories = Object.keys(lists).slice(1);
+    categories.forEach(category => {
+        const iconClass = getCategoryIconClass(category); // Get matching Font Awesome icon
+        const li = document.createElement("li");
+        li.dataset.category = category;
+        li.innerHTML = `
+            <a><i class="${iconClass} pr-1 has-text-info"></i> ${category}</a>
+        `;
+        ul.appendChild(li);
+    })
+}
+
+function getCategoryIconClass(category) {
+    const iconMap = {
+        "Groceries": "fas fa-shopping-cart",
+        "Child Care": "fas fa-baby",
+        "Utilities": "fas fa-bolt",
+        "Transportation": "fas fa-car",
+        "Healthcare": "fas fa-hospital",
+        "Personal Care": "fas fa-spa",
+        "Investments": "fas fa-chart-line",
+        "Entertainment": "fas fa-theater-masks",
+        "Debt Payments": "fas fa-credit-card",
+        "Housing": "fas fa-home",
+        "Household Essentials": "fas fa-box",
+        "Food & Dining": "fas fa-utensils",
+        "Shopping": "fas fa-shopping-bag",
+        "Stationery": "fas fa-pencil-alt",
+        "Education": "fas fa-book",
+        "Miscellaneous": "fas fa-random"
+    };
+
+    return iconMap[category] || "fas fa-question-circle"; // Default icon for unknown categories
+}
+
 
 function createCategories(items, containerId, inputId, labelText) {
     const container = document.getElementById(containerId);
@@ -1233,6 +1261,7 @@ document.getElementById("categoryTabs").addEventListener("click", event => {
 function activateTab(tab, category) {
     // Highlight active category tab
     document.querySelectorAll("#categoryTabs li").forEach(item => item.classList.remove("is-active"));
+    
     tab.classList.add("is-active");
     // Set selected category value
     document.getElementById("selectedCategory").value = category;
@@ -1272,6 +1301,8 @@ function updateButtons(items, containerId, inputId, labelText) {
 // Form submission event with field validation
 document.getElementById("transaction-form").addEventListener("submit", function (event) {
     event.preventDefault();
+    let isSuccess = false;
+
 
     const category = document.getElementById("selectedCategory").value;
     let amount = document.getElementById("amountInput").value;
@@ -1297,6 +1328,7 @@ document.getElementById("transaction-form").addEventListener("submit", function 
         )
         return;
     }
+    let dynamicMessage = "null"
     disabledSubmitBtn(true);
     // AJAX submission using plaintext with UTF-8 charset
     fetch(apiUrl, {
@@ -1306,6 +1338,15 @@ document.getElementById("transaction-form").addEventListener("submit", function 
     })
         .then(response => response.text())
         .then(message => {
+            console.log(message);
+            if (message != "Invalid Action") {
+                isSuccess = true;
+            }
+            dynamicMessage = message
+            updateAlert(isSuccess, dynamicMessage);
+            // Dynamic message includes the user input if successful; else, a default error.
+            handleModal("alert-modal", "open")
+
             // Fetch transaction data
             fetchData("getTransaction").then(data => {
                 transactionData = data;
@@ -1316,17 +1357,23 @@ document.getElementById("transaction-form").addEventListener("submit", function 
             fetchData("getTodayTransaction").then(data => {
                 loadTodayTransaction(data.data);
             });
-            feedbackMessage('green', message)
+
             disabledSubmitBtn(false)
             resetForm();
         })
         .catch(error => {
+            isSuccess = false;
+            dynamicMessage = error.message
+            updateAlert(isSuccess, dynamicMessage);
+            handleModal("alert-modal", "open")
             disabledSubmitBtn(false)
             console.error("Error:", error);
 
         }).finally(() => {
+            isSuccess = false;
             disabledSubmitBtn(false)
         })
+
 });
 
 // Reset event listener: Clear all hidden inputs and reinitialize default category selection
@@ -1383,4 +1430,56 @@ function loadTodayTransaction(lists) {
 // Fetch today transaction data
 fetchData("getTodayTransaction").then(data => {
     loadTodayTransaction(data.data);
+});
+
+const form = document.getElementById('transaction-form');
+const alertBox = document.getElementById('alertBox');
+const alertIcon = document.getElementById('alertIcon');
+const alertTitle = document.getElementById('alertTitle');
+const alertMessage = document.getElementById('alertMessage');
+const alertClose = document.getElementById('alertClose');
+
+// Function to update the alert box based on form status and a dynamic message.
+function updateAlert(isSuccess, messageContent) {
+    console.log("isSuccess:" + isSuccess);
+    console.log("messageContent:" + messageContent);
+    if (isSuccess) {
+
+        const successColor = "#27ae60"; // Dark green
+        alertIcon.innerHTML = '<i class="fas fa-smile"></i>';
+        alertIcon.style.color = successColor;
+        alertIcon.style.backgroundColor = "rgba(39, 174, 96, 0.1)";
+        alertTitle.textContent = 'Success';
+        alertTitle.style.color = successColor;
+        alertMessage.textContent = messageContent;
+        alertClose.textContent = 'Close';
+        alertClose.style.backgroundColor = "rgba(39, 174, 96, 0.1)";
+        alertClose.style.color = successColor;
+    } else {
+        const failureColor = "#c0392b"; // Dark red
+        alertIcon.innerHTML = '<i class="fas fa-frown"></i>';
+        alertIcon.style.color = failureColor;
+        alertIcon.style.backgroundColor = "rgba(192, 57, 43, 0.1)";
+        alertTitle.textContent = 'Failed!';
+        alertTitle.style.color = failureColor;
+        alertMessage.textContent = messageContent;
+        alertClose.textContent = 'Try Again';
+        alertClose.style.backgroundColor = "rgba(192, 57, 43, 0.1)";
+        alertClose.style.color = failureColor;
+    }
+    alertBox.style.display = 'block';
+}
+
+
+// The alert button will work differently based on its label.
+alertClose.addEventListener('click', () => {
+    if (alertClose.textContent.trim() === 'Try Again') {
+        // Hide the alert and re-trigger the form submission.
+        alertBox.style.display = 'none';
+        // Use requestSubmit if available to simulate a resubmission.
+        form.requestSubmit ? form.requestSubmit() : form.submit();
+    } else {
+        // For a success state, simply close the alert.
+        handleModal("alert-modal", "close")
+    }
 });
