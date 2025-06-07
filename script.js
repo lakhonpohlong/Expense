@@ -1260,8 +1260,11 @@ document.getElementById("categoryTabs").addEventListener("click", event => {
 // Activate a category tab and update subcategory and payment source buttons
 function activateTab(tab, category) {
     // Highlight active category tab
-    document.querySelectorAll("#categoryTabs li").forEach(item => item.classList.remove("is-active"));
-    
+    document.querySelectorAll("#categoryTabs li").forEach(item => {
+        item.classList.remove("is-active")
+        item.classList.remove("has-text-info");
+    });
+
     tab.classList.add("is-active");
     // Set selected category value
     document.getElementById("selectedCategory").value = category;
