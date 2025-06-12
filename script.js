@@ -1,7 +1,7 @@
 const apiUrl = CONFIG.API_URL;
 const colorPalletes = ["#ecf5fc", "#e8f7e6", "#fceced", "#fff8dc", "#d6e6ff", "#ffffea", "#e5d4ef", "##d1dbe4"];
 let currentPage = 1;
-const ITEMS_PER_PAGE = 50; // Number of items per 
+const ITEMS_PER_PAGE = 100; // Number of items per 
 let transactionData = [];
 let filterTransactionData = [];
 let isEditing = false; // Flag to check if we are editing
@@ -219,9 +219,10 @@ function handleModalWithCheckbox(modalId, action) {
     const modal = document.getElementById(modalId);
     if (modal) {
         if (action === 'open') {
+
             // Load the checkboxes dynamically first
             createInputData(cardList, "panel-payment")
-            createInputData(subCategoryList, "panel-category")
+            createInputData(headerList, "panel-category")
 
             const savedFiltersRaw = localStorage.getItem("selectedFilters");
             if (savedFiltersRaw !== null) {
@@ -268,8 +269,12 @@ function handleModalWithCheckbox(modalId, action) {
 document.querySelectorAll('[data-modal]').forEach(button => {
     button.addEventListener('click', function () {
         const modalId = this.getAttribute('data-modal');
-        //handleModal(modalId, 'open');
-        handleModalWithCheckbox(modalId, 'open')
+
+        if (modalId === 'filter-modal') {
+            handleModalWithCheckbox(modalId, 'open')
+        } else {
+            handleModal(modalId, 'open');
+        }
     });
 });
 
@@ -886,7 +891,7 @@ function fetchCategories() {
     })
         .then(response => response.json())
         .then(data => {
-            // headerList = data.headers;
+            headerList = Object.keys(data).slice(1);
             subCategoryList = data
             console.log(subCategoryList["Groceries"]);
 
@@ -914,7 +919,9 @@ function disabledSubmitBtn(disabled) {
 /* TRANSACTION LIST WITH FILTER START */
 
 function renderTransactions(isFilter, page) {
+    let expense = 0;
     const transactionContainer = document.getElementById("transactions");
+
     transactionContainer.innerHTML = "";
     const totalDiv = document.createElement("div");
     const scrollContainer = document.createElement("div");
@@ -938,6 +945,7 @@ function renderTransactions(isFilter, page) {
     transactionContainer.appendChild(totalDiv)
     transactionContainer.appendChild(scrollContainer)
     transactions.forEach(transaction => {
+        expense += transaction.amount;
         let category = getCategoryDetails(transaction.spendCategory)
         const card = document.createElement("div");
         card.classList.add("card", "is-flex");
@@ -956,6 +964,7 @@ function renderTransactions(isFilter, page) {
                 </div>
             </div>
     `;
+        document.getElementById("tranId").innerText = expense
 
         // Add click event listener to highlight selected card
         card.addEventListener("click", function () {
@@ -980,7 +989,6 @@ function renderTransactions(isFilter, page) {
 function createInputData(list, elementId) {
     const container = document.getElementById(elementId);
     container.innerHTML = "";
-
     list.forEach(item => {
         const elementFilter = document.createElement("div");
         elementFilter.innerHTML = `
@@ -1283,10 +1291,15 @@ function updateButtons(items, containerId, inputId, labelText) {
     container.innerHTML = `<label class="label" style="font-size: 13px;">Select ${labelText}:</label><div class="buttons"></div>`;
     const buttonGroup = container.querySelector(".buttons");
 
-    items.forEach(item => {
+    items.forEach((item, index) => {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "button";
+        // Set default active class on the first button
+        if (index === 0) {
+            button.classList.add("is-link");
+            document.getElementById(inputId).value = item; // Set default selected value
+        }
         button.textContent = item;
         button.addEventListener("click", () => {
             // Remove active class from all buttons in this group
@@ -1309,9 +1322,7 @@ document.getElementById("transaction-form").addEventListener("submit", function 
     const category = document.getElementById("selectedCategory").value;
     let amount = document.getElementById("amountInput").value;
 
-    if (category === "Debt Payments") {
-        amount = -amount;
-    }
+
     // Capture form data
     const formData = {
         date: formatDateIST(document.getElementById("expenseDate").value),
@@ -1382,6 +1393,39 @@ document.getElementById("transaction-form").addEventListener("submit", function 
 document.getElementById("transaction-form").addEventListener("reset", function (event) {
     // Give the form time to reset before reinitializing the UI
     resetForm()
+});
+
+document.getElementById("fundForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    let amount = document.getElementById("amount").value;
+    let fundType = document.getElementById("fundType").value;
+
+    let requestBody = JSON.stringify({
+        action: "add",
+        module: "Income",
+        data: {
+            amount: amount,
+            fundType: fundType
+        }
+    });
+
+    fetch(apiUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "text/plain; charset=UTF-8"
+        },
+        body: requestBody
+    })
+        .then(response => response.text()) // Parse JSON response
+        .then(data => {
+            console.log("Success:", data);
+            alert("Form submitted successfully!");
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Error submitting form!");
+        });
 });
 
 function loadTodayTransaction(lists) {

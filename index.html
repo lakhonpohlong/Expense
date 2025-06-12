@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="stylesRR.css">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
   <style>
     body,
     .section {
@@ -578,9 +580,13 @@
   <section id="profile" class="section">
     <div class="row is-flex is-flex-row is-justify-content-space-between">
       <div class="titleHead">Profile List</div>
-      <button class="button modal-button" id="addBtn" data-modal="profile-modal"><i class="fas fa-plus"></i>
+      <button class="button modal-button is-small" id="addBtn" data-modal="profile-modal"><i class="fas fa-plus"></i>
         <span class="pl-1">Add Profile</span>
       </button>
+      <button type="button" class="switch-btn button is-small" id="addFundBtn" data-target="addFund"
+        style="flex: 1;">Add
+        Fund</button>
+
     </div>
     <table class="table is-striped is-hoverable is-fullwidth">
       <thead>
@@ -622,7 +628,10 @@
         Transactions will be dynamically inserted here -->
 
     <div class="top-container">
-      <h1 class="title is-size-6">Transaction History</h1>
+      <h1 class="title is-size-5"
+        style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        Transaction History <span id="tranId">4560</span>
+      </h1>
       <!-- Filter Button -->
       <div class="filter-btn-containerd is-flex is-justify-content-space-between">
         <div class="control has-icons-left">
@@ -718,7 +727,43 @@
     <p id="email">Your email will appear here after login.</p>
     <button id="logoutBtn" style="display: none;" onclick="logout()">Logout</button>
   </section>
-  </main> <!-- Modals -->
+
+  <section class="section" id="addFund">
+    <h1 class="title has-text-centered">Fund Entry Form</h1>
+
+    <form id="fundForm">
+      <!-- Amount Field -->
+      <div class="field">
+        <label class="label">Amount</label>
+        <div class="control">
+          <input class="input" type="number" id="amount" placeholder="Enter amount" required>
+        </div>
+      </div>
+
+      <!-- Fund Type Selection -->
+      <div class="field">
+        <label class="label">Fund Type</label>
+        <div class="control">
+          <div class="select is-fullwidth">
+            <select id="fundType">
+              <option value="Salary">Salary</option>
+              <option value="Bonus">Bonus</option>
+              <option value="Other Source">Other Source</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="field">
+        <div class="control">
+          <button class="button is-primary is-fullwidth" type="submit">Submit</button>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  </main>
 
   <!-- Modal -->
   <div class="modal" id="profile-modal">
