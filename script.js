@@ -1443,12 +1443,13 @@ function loadTodayTransaction(lists) {
     container.appendChild(title_con);
     if (lists.length > 0) {
         lists.forEach((item) => {
+            const categoryIcon = getCategoryIconClass(item.category);
             total += item.amount;
             container.innerHTML += `
     <div class="column  is-full">
         <div class="columns card-transaction">
             <div class="column first-column">
-                <div class="rounded-div">${item.icon}</div>
+                <div class="rounded-div"><i class="${categoryIcon} has-text-white"></i></div>
             </div>
             <div class="column has-text-left second-column">
                 <p class="is-size-6 has-text-weight-bold">${item.subcategory}</p>
