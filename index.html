@@ -118,6 +118,7 @@
 
     /* Card Layout */
     .card {
+      position: relative;
       /* padding: 0.5rem 0.8rem; */
       /* Light border */
       border-radius: 6px;
@@ -131,8 +132,24 @@
     }
 
     .payments {
-      border: 1px solid rgba(32, 156, 238, 0.5);
+      border: 1px solid rgba(32, 156, 238, 0.8);
     }
+
+    .triangle {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 0;
+      height: 0;
+      border-right: 15px solid #209CEE;
+      /* Triangle color */
+      border-bottom: 14px solid transparent;
+      /* Flat bottom */
+      border-left: 14px solid transparent;
+      /* 45-degree slope */
+      border-radius: 0 6px 0 0;
+    }
+
 
     .left-cardData {
       background-color: #209cee;

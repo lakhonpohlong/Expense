@@ -955,6 +955,8 @@ function renderTransactions(isFilter, page) {
         }
         card.classList.add("card", "is-flex");
         card.innerHTML = `
+        <div class="triangle">
+        </div>
             <div class="left-cardData is-size-7" style="width: 20%;">
             <p class="has-text-weight-bold">${formatDateWithOrdinal(transaction.date)}</p>
             </div>
@@ -1043,7 +1045,7 @@ function getCategoryIconClass(category) {
         "Child Care": "fas fa-baby",
         "Utilities": "fas fa-bolt",
         "Transportation": "fas fa-car",
-        "Healthcare": "fas fa-hospital",
+        "Health Care": "fas fa-hospital",
         "Personal Care": "fas fa-spa",
         "Investments": "fas fa-chart-line",
         "Entertainment": "fas fa-theater-masks",
