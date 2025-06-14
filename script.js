@@ -950,6 +950,9 @@ function renderTransactions(isFilter, page) {
         }
         let category = getCategoryDetails(transaction.spendCategory)
         const card = document.createElement("div");
+        if (transaction.subcategory === "Credit Card Bills") {
+            card.classList.add("payments")
+        }
         card.classList.add("card", "is-flex");
         card.innerHTML = `
             <div class="left-cardData is-size-7" style="width: 20%;">
@@ -961,7 +964,10 @@ function renderTransactions(isFilter, page) {
                     <span class="amount is-size-6 has-text-info has-text-weight-bold one-line-amount has-text-right">${formatAmountInINR(transaction.amount)}</span>
                 </div>
                     <div class="is-flex is-justify-content-space-between">
-                    <span class="is-size-7"> ${transaction.category}  |  ${extractTime(transaction.date)}</span>
+                    <div>
+                        <span class="is-size-7"> ${transaction.category}</span>
+                    <span class="is-size-7 has-text-info">${extractTime(transaction.date)}</span>
+                    </div>
                     <span class="is-size-7">${transaction.card}</span>
                 </div>
             </div>
@@ -980,8 +986,8 @@ function renderTransactions(isFilter, page) {
 }
 function extractTime(isoString) {
     var date = new Date(isoString);
-    var hours = date.getHours();
-    var minutes = date.getMinutes();
+    var hours = date.getHours().toString().padStart(2, '0');;
+    var minutes = date.getMinutes().toString().padStart(2, '0');;
 
     return `${hours}:${minutes}`;
 }
