@@ -945,7 +945,7 @@ function renderTransactions(isFilter, page) {
     transactionContainer.appendChild(totalDiv)
     transactionContainer.appendChild(scrollContainer)
     transactions.forEach(transaction => {
-        if (transaction.subcategory != "Credit Card Bills") {
+        if (transaction.subcategory != "Credit Card Bills") { //"Debt Payments
             expense += transaction.amount;
         }
         let category = getCategoryDetails(transaction.spendCategory)
@@ -961,7 +961,7 @@ function renderTransactions(isFilter, page) {
                     <span class="amount is-size-6 has-text-info has-text-weight-bold one-line-amount has-text-right">${formatAmountInINR(transaction.amount)}</span>
                 </div>
                     <div class="is-flex is-justify-content-space-between">
-                    <span class="is-size-7"> ${transaction.category}</span>
+                    <span class="is-size-7"> ${transaction.category}  |  ${extractTime(transaction.date)}</span>
                     <span class="is-size-7">${transaction.card}</span>
                 </div>
             </div>
@@ -977,6 +977,13 @@ function renderTransactions(isFilter, page) {
         transactionContainer.appendChild(card);
     });
     renderPagination(page); // Render pagination controls
+}
+function extractTime(isoString) {
+    var date = new Date(isoString);
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+
+    return `${hours}:${minutes}`;
 }
 
 // // Apply button: add any filtering logic as required and then close the modal
