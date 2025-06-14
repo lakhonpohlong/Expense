@@ -1046,7 +1046,7 @@ function getCategoryIconClass(category) {
         "Child Care": "fas fa-baby",
         "Utilities": "fas fa-bolt",
         "Transportation": "fas fa-car",
-        "Health Care": "fas fa-hospital",
+        "Health Care": "fas fa-notes-medical",
         "Personal Care": "fas fa-spa",
         "Investments": "fas fa-chart-line",
         "Entertainment": "fas fa-theater-masks",
