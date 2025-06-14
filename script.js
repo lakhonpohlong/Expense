@@ -945,7 +945,9 @@ function renderTransactions(isFilter, page) {
     transactionContainer.appendChild(totalDiv)
     transactionContainer.appendChild(scrollContainer)
     transactions.forEach(transaction => {
-        expense += transaction.amount;
+        if (transaction.subcategory != "Credit Card Bills") {
+            expense += transaction.amount;
+        }
         let category = getCategoryDetails(transaction.spendCategory)
         const card = document.createElement("div");
         card.classList.add("card", "is-flex");
@@ -1372,7 +1374,7 @@ document.getElementById("transaction-form").addEventListener("submit", function 
             });
 
             disabledSubmitBtn(false)
-            resetForm();
+            //resetForm();
         })
         .catch(error => {
             isSuccess = false;
@@ -1456,7 +1458,7 @@ function loadTodayTransaction(lists) {
                 <p class="is-size-7">${item.category}</p>
             </div>
             <div class="column third-column">
-                <p class="has-text-info has-text-weight-bold">${formatAmountInINR(item.amount)}</p>
+                <p class="has-text-info  is-size-6 has-text-weight-bold">${formatAmountInINR(item.amount)}</p>
                 <p class="is-size-7">${item.card}</p>
             </div>
         </div>

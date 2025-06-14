@@ -439,7 +439,8 @@
       min-height: 32px;
     }
 
-    .input {
+    .input,
+    .selectOwner {
       font-size: 12px;
       padding: 6px;
       height: 30px;
@@ -572,7 +573,7 @@
 
   <section id="home" class="section active">
     <div class="titleHead">Credit Card Details</div>
-    <div class="columns is-mobile is-multiline" id="dashboard-content">
+    <div class="columns is-mobile is-multiline is-flex is-justify-content-start" id="dashboard-content">
     </div>
     <div class="columns is-mobile is-multiline" id="todayTransaction-content">
     </div>
@@ -692,11 +693,25 @@
         <!-- Payment Source Buttons -->
         <div id="paymentSourceContainer" class="field"></div>
 
-        <!-- Amount & Description Inputs -->
-        <div class="field">
-          <label class="label" style="font-size: 13px;">Amount (₹)</label>
-          <div class="control">
-            <input type="number" class="input" id="amountInput" name="amount" required />
+        <div class="is-flex is-justify-content-space-between">
+          <!-- Amount & Description Inputs -->
+          <div class="field">
+            <label class="label" style="font-size: 13px;">Amount (₹)</label>
+            <div class="control">
+              <input type="number" class="input" id="amountInput" name="amount" required />
+            </div>
+          </div>
+          <div class="field">
+            <label class="label" style="font-size: 13px;">Expense For</label>
+            <div class="control">
+              <div class="select selectOwner">
+                <select id="fundType">
+                  <option value="Salary">owner</option>
+                  <option value="Bonus">Relative</option>
+                  <option value="Other Source">Friend</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
         <div class="field">
