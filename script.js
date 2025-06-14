@@ -955,7 +955,7 @@ function renderTransactions(isFilter, page) {
         }
         card.classList.add("card", "is-flex");
         card.innerHTML = `
-        <div class="triangle">
+        <div class="triangle ${transaction.category.toLowerCase().replace(" ", "-")}">
         </div>
             <div class="left-cardData is-size-7" style="width: 20%;">
             <p class="has-text-weight-bold">${formatDateWithOrdinal(transaction.date)}</p>
@@ -975,7 +975,7 @@ function renderTransactions(isFilter, page) {
             </div>
     `;
         document.getElementById("tranId").innerText = expense
-
+        // Delay color application to ensure element is created
         // Add click event listener to highlight selected card
         card.addEventListener("click", function () {
             document.querySelectorAll(".card").forEach(c => c.classList.remove("selected-card")); // Remove highlight from all
@@ -983,6 +983,7 @@ function renderTransactions(isFilter, page) {
         });
 
         transactionContainer.appendChild(card);
+
     });
     renderPagination(page); // Render pagination controls
 }
@@ -1061,7 +1062,21 @@ function getCategoryIconClass(category) {
 
     return iconMap[category] || "fas fa-question-circle"; // Default icon for unknown categories
 }
+const categoryColors = {
+    "Groceries": "#4CAF50",
+    "Child Care": "#FF9800",
+    "Health Care": "#E91E63",
+    "Food & Dining": "#FFC107",
+    "Shopping": "#9C27B0",
+    "Debt Payments": "#607D8B",
+    "Utilities": "#2196F3",
+    "Transportation": "#F44336"
+};
 
+// Function to update the triangle color dynamically
+function updateTriangleColor(category) {
+    document.querySelector(".triangle").style.borderRightColor = categoryColors[category] || "#209CEE"; // Default color
+}
 
 function createCategories(items, containerId, inputId, labelText) {
     const container = document.getElementById(containerId);
